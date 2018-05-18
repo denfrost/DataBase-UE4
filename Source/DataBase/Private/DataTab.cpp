@@ -1,6 +1,8 @@
 #include "DataTab.h"
 #include "SDataTab.h"
 
+// const FName FDataTableHeaderStyle::TypeName(TEXT("FDataTableHeaderStyle"));
+
 
 UDataTab::UDataTab()
 {

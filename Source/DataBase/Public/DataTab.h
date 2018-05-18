@@ -37,6 +37,11 @@ public:
 		static ConstructorHelpers::FObjectFinder<UFont> RobotoFontObj(TEXT("/Engine/EngineFonts/Roboto"));
 		Font = FSlateFontInfo(RobotoFontObj.Object, 24, FName("Bold"));
 	}
+
+	static const FDataTableHeaderStyle& GetDefault() {
+		static FDataTableHeaderStyle Default;
+		return Default;
+	};
 };
 
 USTRUCT(BlueprintType)

@@ -42,6 +42,7 @@ public class DataBase : ModuleRules
 				"SlateCore",
                 "UMG",
                 "InputCore",
+                "Projects",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

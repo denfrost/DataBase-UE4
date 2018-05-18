@@ -28,21 +28,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data Table", meta = (ToolTip = "Allow drop box to limit your finidings"))
 		float ColumnWidth;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data Table", meta = (ToolTip = "true if you only want string like std xlxs formats/basic data tables or false if you want special widgets"))
-		bool bUseOnlyStrings;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data Table", meta = (ToolTip = "Allow drop box to limit your finidings"))
-		bool bAllowSearch;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data Table", meta = (ToolTip = "Criteria field to be match with your data table, if your criteria match your value then you will conserver visible this on your Data Table widget"))
-		TArray<FString> SearchCriteria;
-
 	FDataTableColumnDescription()
 	{
 		FieldName = FText::FromString("None");
 		Type = EDataTableTypes::String;
-		bUseOnlyStrings = true;
-		bAllowSearch = false;
 		ColumnWidth = 1.f;
 	}
 };
@@ -72,8 +61,13 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Data Table Options")
 		UScriptStruct* Struct;
 
+	UPROPERTY(EditAnywhere, Category = "Data Table Options", meta = (ToolTip = "Whenever we want to use custom widget for variables types"))
+		bool bUseCustomWidgets;
+
+	UPROPERTY(EditAnywhere, Category = "Data Table Options", meta = (ToolTip = "Search criteria tell your UI how to display the info, usually searching for fields if variable A = price your search critaria can be $20000"))
+		TArray<FString> SearchTags;
+
 	UPROPERTY(EditAnywhere, Category = "Data Table Options")
 		TArray<FDataTableColumnDescription> Fields;
-
 
 };

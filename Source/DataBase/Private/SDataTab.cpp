@@ -5,29 +5,37 @@
 
 void SDataTab::UpdateWidget()
 {
+	ensure(Header.IsValid());
+	ensure(HeaderStyle);
+
 	Header->ClearColumns();
 	for (int32 i = 0; i < ColumnDescriptions.Num(); i++)
 	{
-// 		FString ID = "Header_" + FString::FromInt(i);
-// 		Header->AddColumn(
-// 			SHeaderRow::Column(FName(*ID))
-// 			.FillWidth(ColumnDescriptions[i].ColumnWidth)
-// 			.HeaderContent()
-// 			[
-// 				SNew(SDataTabHeader)
-// 				.VarName(ColumnDescriptions[i].FieldName)
-// 				.TextColor(HeaderStyle.Get()->TextColorAndOpacity)
-// 				.FontInfo(HeaderStyle.Get()->Font)
-// 				.Justification(HeaderStyle.Get()->Justification)
-// 				.Style(&HeaderStyle.Get()->Header)
-// 			]
-// 		);
+		FString ID = "Header_" + FString::FromInt(i);
+		Header->AddColumn(
+			SHeaderRow::Column(FName(*ID))
+			.FillWidth(ColumnDescriptions[i].ColumnWidth)
+			.HeaderContent()
+			[
+				SNew(SDataTabHeader)
+				.VarName(ColumnDescriptions[i].FieldName)
+				.TextColor(HeaderStyle->TextColorAndOpacity)
+				.FontInfo(HeaderStyle->Font)
+				.Justification(HeaderStyle->Justification)
+				.Style(&HeaderStyle->Header)
+			]
+		);
 	}
 }
 
 void SDataTab::Construct(const FArguments& InArgs)
 {
 	HeaderStyle = InArgs._HeaderStyle;
+	if (!HeaderStyle)
+	{
+		HeaderStyle = &FDataTableHeaderStyle::GetDefault();
+	}
+
 	ColumnDescriptions = InArgs._ColumnDescriptions;
 
 	ChildSlot[
