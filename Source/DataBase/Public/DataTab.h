@@ -12,7 +12,7 @@
 USTRUCT(BlueprintType)
 struct FDataTableHeaderStyle
 {
-	GENERATED_BODY()
+	GENERATED_USTRUCT_BODY()
 
 public:
 
@@ -21,9 +21,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data Table")
 		FMargin Margin;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data Table")
-		FMargin ContentMargin;
 
 	/** The font to render the text with */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Appearance)
@@ -37,6 +34,20 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data Table")
 		float HandlerSize;
+
+	UPROPERTY()
+		FEditableTextBoxStyle TextBoxStyle;
+
+	FDataTableHeaderStyle()
+	{
+		UFont* RobotoFontObj = LoadObject<UFont>(nullptr,TEXT("/Engine/EngineFonts/Roboto"));
+		Font = FSlateFontInfo(RobotoFontObj, 12, FName("Bold"));
+
+		TextBoxStyle.BackgroundImageNormal.TintColor = FSlateColor(FLinearColor(0, 0, 0, 1));
+		TextBoxStyle.ForegroundColor = FSlateColor(FLinearColor(1, 1, 1, 1));
+		TextBoxStyle.BackgroundImageHovered.TintColor = FSlateColor(FLinearColor(.5f, .5f, .5f, .5f));
+		TextBoxStyle.BackgroundImageFocused.TintColor = FSlateColor(FLinearColor(.2f, .2f, .2f, .2f));
+	}
 };
 
 USTRUCT(BlueprintType)
@@ -53,6 +64,15 @@ public:
 		FMargin SlotMargin;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data Table")
+		FSlateColor TextColorAndOpacity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data Table")
+		FSlateFontInfo Font;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data Table")
+		TEnumAsByte<ETextJustify::Type> Justification;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data Table")
 		FSlateBrush Normal;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data Table")
@@ -62,57 +82,88 @@ public:
 		FSlateBrush Hovered;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data Table")
-		FSlateBrush Disabled;
+		FScrollBarStyle ScrollBarStyle;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data Table")
-		FSlateBrush SliderNormal;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data Table")
-		FSlateBrush SliderPressed;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data Table")
-		FSlateBrush SliderHovered;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data Table")
-		FSlateBrush SliderDisabled;
 
 	UPROPERTY()
 		FEditableTextBoxStyle TextBoxStyle;
 };
 
 USTRUCT(BlueprintType)
-struct FDataTableStyle
+struct FDataTableStyleOverride
 {
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data Table")
+		FSlateFontInfo Font;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data Table")
+		FSlateColor Color;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data Table")
+		TEnumAsByte<ETextJustify::Type> Justification;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data Table")
+		int32 ColumnIndex;
+
+	FDataTableStyleOverride()
+	{
+		UFont* RobotoFontObj = LoadObject<UFont>(nullptr, TEXT("/Engine/EngineFonts/Roboto"));
+		Font = FSlateFontInfo(RobotoFontObj, 12, FName("Bold"));
+
+		Color = FSlateColor(FLinearColor::White);
+		Justification = ETextJustify::Left;
+		ColumnIndex = 0;
+	}
+};
+
+USTRUCT(BlueprintType)
+struct FDataTableStyle
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data Table")
 		FDataTableHeaderStyle HeaderStyle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data Table")
 		FDataTableBodyStyle BodyStyle;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data Table")
+		TArray<FDataTableStyleOverride> BodyStyleColumnsOverrides;
+
 	FDataTableStyle()
 	{
+// 		static ConstructorHelpers::FObjectFinder<UFont> RobotoFontObj(TEXT("/Engine/EngineFonts/Roboto"));
+// 		HeaderFont = FSlateFontInfo(RobotoFontObj.Object, 12, FName("Bold"));
+
+
 		HeaderStyle.HandlerSize = 1;
-		HeaderStyle.ContentMargin = FMargin(0);
 		HeaderStyle.Margin = FMargin(1, 1, 1, 1);
 		HeaderStyle.TextColorAndOpacity = FSlateColor(FLinearColor::White);
 		HeaderStyle.HeaderBrush.TintColor = FSlateColor(FLinearColor(0.2f, 0.2f, 0.2f, 1));
-		static ConstructorHelpers::FObjectFinder<UFont> RobotoFontObj(TEXT("/Engine/EngineFonts/Roboto"));
-		HeaderStyle.Font = FSlateFontInfo(RobotoFontObj.Object, 12, FName("Bold"));
+// 		
 		HeaderStyle.Justification = ETextJustify::Center;
 
 
 		BodyStyle.GeneralMargin = FMargin(0);
 		BodyStyle.SlotMargin = FMargin(0);
-		BodyStyle.Normal.TintColor = FSlateColor(FLinearColor(0, 0, 0, 0));
+		BodyStyle.TextColorAndOpacity = FSlateColor(FLinearColor(1, 1, 1 ,1));
+		UFont* RobotoFontObj = LoadObject<UFont>(nullptr, TEXT("/Engine/EngineFonts/Roboto"));
+		BodyStyle.Font = FSlateFontInfo(RobotoFontObj, 12, FName("Bold"));
+
+		BodyStyle.Justification = ETextJustify::Left;
+		BodyStyle.Normal.TintColor = FSlateColor(FLinearColor(0, 0, 0, 1));
 		BodyStyle.Hovered.TintColor = FSlateColor(FLinearColor(.5f, .5f, .5f, .5f));
 
 		BodyStyle.TextBoxStyle.BackgroundImageNormal.TintColor = BodyStyle.Normal.TintColor;
 		BodyStyle.TextBoxStyle.ForegroundColor = FSlateColor(FLinearColor(1, 1, 1, 1));
 		BodyStyle.TextBoxStyle.BackgroundImageHovered.TintColor = BodyStyle.Hovered.TintColor;
 		BodyStyle.TextBoxStyle.BackgroundImageFocused.TintColor = FSlateColor(FLinearColor(.2f, .2f, .2f, .2f));
+
+		BodyStyleColumnsOverrides = TArray<FDataTableStyleOverride>();
 	}
 
 	static const FDataTableStyle& GetDefault() {
@@ -120,6 +171,8 @@ public:
 		return Default;
 	};
 };
+
+
 
 
 UCLASS()
@@ -148,6 +201,9 @@ public:
 
 	virtual void ReleaseSlateResources(bool bReleaseChildren) override;
 	virtual void SynchronizeProperties() override;
+
+	UFUNCTION(BlueprintCallable, Category = "Data Table")
+		void SetRowStyleOverride(int32 Index, const FDataTableStyleOverride& InStyle);
 
 protected:
 	virtual TSharedRef<SWidget> RebuildWidget() override;

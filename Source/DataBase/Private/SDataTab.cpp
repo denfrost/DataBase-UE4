@@ -1,9 +1,7 @@
 #include "SDataTab.h"
 #include "SDTHeaderRow.h"
 #include "Runtime/SlateCore/Public/Widgets/SBoxPanel.h"
-#include "SDataTabHeader.h"
 #include "Runtime/Slate/Public/Widgets/Layout/SScrollBox.h"
-#include "SDataTableRow.h"
 
 void SDataTab::OnRowChanged(const int32& RowIndex, const int32& ColumnIndex, const FString& Value)
 {
@@ -12,20 +10,7 @@ void SDataTab::OnRowChanged(const int32& RowIndex, const int32& ColumnIndex, con
 
 void SDataTab::UpdateWidget()
 {
-	ensure(Header.IsValid());
-	ensure(DataTableStyle);
-
-	Header->ClearColumns();
-	for (int32 ID = 0; ID < Fields.Num(); ID++)
-	{
-// 		Header->AddColumn(
-// 			ID
-// 			, SNew(SDataTabHeader)
-// 			.VarName(Fields[ID].FieldName)
-// 			.DataTableStyle(DataTableStyle)
-// 		);
-	}
-
+	Header->SetColumns(Fields, TArray<FString>());
 	if (CurrentDataObject.IsValid())
 	{
 		Rows.Empty();
@@ -46,7 +31,7 @@ void SDataTab::SetFields(const TArray<FDataTableFieldDescription>& InFields)
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("SDataTab::SetFields NO DataObject Assigned"));
+		UE_LOG(LogTemp, Error, TEXT("SDataTab::SetFields No DataObject Assigned"));
 	}
 	UpdateWidget();
 }
@@ -66,19 +51,30 @@ void SDataTab::AddRow(TArray<FString>& Values,const bool& bUseWidgets,const bool
 	int32 RowIndex = Rows.Num();
 
 	TSharedPtr<SDTHeaderRow> NewRow;
-	SScrollBox::FSlot& PosSlot = RowContainer->AddSlot();
+	SScrollBox::FSlot& PosSlot = RowContainer->AddSlot().Padding(DataTableStyle->BodyStyle.GeneralMargin);
 	PosSlot[
 		SAssignNew(NewRow, SDTHeaderRow)
 			.Values(Values)
-			.DataTableStyle(&FDataTableStyle::GetDefault())
-			.ID(RowIndex)
+			.DataTableStyle(DataTableStyle)
+			.RowIndex(RowIndex)
 			.Fields(Fields)
 			.OnDTRowChanged(this, &SDataTab::OnRowChanged)
-			.HumanEditable(false)
+			.Editable(bIsEditable)
+			.bIsMaster(false)
 	];
 
 	check(NewRow.IsValid());
 	Rows.Add(NewRow);
+}
+
+void SDataTab::SetRowStyleOverride(const int32& Index, const FDataTableStyleOverride& InStyle)
+{
+	if (Rows.IsValidIndex(Index))
+	{
+		Rows[Index]->OverrideColumnStyle(InStyle);
+		return;
+	}
+	UE_LOG(LogTemp, Warning, TEXT("SDataTab::SetRowStyleOverride  Invalid Row Index"));
 }
 
 void SDataTab::Construct(const FArguments& InArgs)
@@ -89,6 +85,7 @@ void SDataTab::Construct(const FArguments& InArgs)
 	DataTableStyle = InArgs._DataTableStyle;
 	Fields = InArgs._ColumnDescriptions;
 
+
 	ChildSlot[
 		SNew(SVerticalBox)
 		+ SVerticalBox::Slot()
@@ -96,6 +93,9 @@ void SDataTab::Construct(const FArguments& InArgs)
 		.AutoHeight()
 		[
 			SAssignNew(Header, SDTHeaderRow)
+				.DataTableStyle(DataTableStyle)
+				.Fields(Fields)
+				.bIsMaster(true)
 		]
 		+ SVerticalBox::Slot()
 		.HAlign(HAlign_Fill)
@@ -103,7 +103,7 @@ void SDataTab::Construct(const FArguments& InArgs)
 		[
 			SAssignNew(RowContainer, SScrollBox)
 			.Style(&FCoreStyle::Get().GetWidgetStyle<FScrollBoxStyle>("ScrollBox"))
-			.ScrollBarStyle(&FCoreStyle::Get().GetWidgetStyle<FScrollBarStyle>("ScrollBar"))
+			.ScrollBarStyle(&DataTableStyle->BodyStyle.ScrollBarStyle)
 			.ScrollBarVisibility(EVisibility::Visible)
 		]
 	];

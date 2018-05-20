@@ -40,6 +40,14 @@ void UDataTab::SynchronizeProperties()
 	Super::SynchronizeProperties();
 }
 
+void UDataTab::SetRowStyleOverride(int32 Index, const FDataTableStyleOverride& InStyle)
+{
+	if (DataTable.IsValid())
+	{
+		DataTable->SetRowStyleOverride(Index,InStyle);
+	}
+}
+
 TSharedRef<SWidget> UDataTab::RebuildWidget()
 {
 	if (DataObject && !DataObject->IsPendingKill())
@@ -48,14 +56,14 @@ TSharedRef<SWidget> UDataTab::RebuildWidget()
 			.DataTableStyle(&DataTableStyle)
 			.ColumnDescriptions(DataObject->Fields)
 			.DataObject(DataObject)
-			.Editable(true);
+			.Editable(false);
 	}
 	else
 	{
 		DataTable = SNew(SDataTab)
 			.DataTableStyle(&DataTableStyle)
 			.DataObject(DataObject)
-			.Editable(true);
+			.Editable(false);
 	}
 	return DataTable->AsShared();
 }

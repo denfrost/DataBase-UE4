@@ -236,15 +236,15 @@ void FDataObjectEditor::AddNewRow()
 
 TSharedRef<SDockTab> FDataObjectEditor::HandleTabManagerSpawnTab(const FSpawnTabArgs& Args, FName TabIdentifier)
 {
-	
-
 	if (TabIdentifier == EditableDataObjectToolKit::DataTableTab)
 	{
+		check(DataObject);
 		DataTableView = SNew(SDataTab)
+			.DataTableStyle(&FDataTableStyle::GetDefault())
 			.ColumnDescriptions(DataObject->Fields)
 			.OnDataTableChanged(this, &FDataObjectEditor::OnDataTableChanged)
 			.DataObject(DataObject)
-			.Editable(false);
+			.Editable(true);
 
 		return SNew(SDockTab)
 			.TabRole(ETabRole::PanelTab)

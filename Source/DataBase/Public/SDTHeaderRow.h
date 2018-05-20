@@ -12,15 +12,17 @@ class SDTHeaderRow : public SCompoundWidget
 
 	SLATE_BEGIN_ARGS(SDTHeaderRow)
 		: _DataTableStyle(&FDataTableStyle::GetDefault())
-		, _ID(-1)
-		, _HumanEditable(false)
+		, _RowIndex(-1)
+		, _Editable(false)
+		, _bIsMaster(false)
 	{}
 	/** Header Styler*/
 	SLATE_ARGUMENT(TArray<FString>, Values)
 	SLATE_ARGUMENT(TArray<FDataTableFieldDescription>, Fields)
+	SLATE_ARGUMENT(bool, bIsMaster)
 	SLATE_ARGUMENT(const FDataTableStyle*, DataTableStyle)
-	SLATE_ARGUMENT(bool, HumanEditable)
-	SLATE_ARGUMENT(int32, ID)
+	SLATE_ARGUMENT(bool, Editable)
+	SLATE_ARGUMENT(int32, RowIndex)
 	SLATE_EVENT(FOnDTRowChanged, OnDTRowChanged)
 		
 	SLATE_END_ARGS()
@@ -31,20 +33,31 @@ private:
 	FOnDTRowChanged OnDTRowChanged;
 
 	const FDataTableStyle* DataTableStyle;
-	int32 ID;
-	bool bIsHumanEditable;
+	int32 RowIndex;
+	bool bIsEditable;
+	bool bIsMaster;
 
+	TSharedPtr<class SBorder> BackgroundBorder;
 	TSharedPtr<class SHorizontalBox> MainContainer;
-	TSharedPtr<class SSplitter> Container;
+	TArray<TSharedPtr<class SDTColumn>> Columns;
 	TArray<int32> ColumnIDs;
 
-	void AddColumn(int32 ID, TSharedRef<SWidget> Widget);
+	void OnColumnChanged(const int32& ColumnIndex, const FString& Value);
 
 public:
 	
+	//BEGIN SWidget
+	virtual FReply OnMouseButtonDoubleClick(const FGeometry& InMyGeometry, const FPointerEvent& InMouseEvent) override;
+	virtual FReply OnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
+	virtual FReply OnMouseButtonUp(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
+	virtual void OnMouseEnter(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
+	virtual void OnMouseLeave(const FPointerEvent& MouseEvent) override;
+	//END SWidget
 
-	void SetFields(const TArray<FDataTableFieldDescription>& InFields, const TArray<FString>& InValues);
+	void SetColumns(const TArray<FDataTableFieldDescription>& InFields, const TArray<FString>& InValues);
+	void UpdateWidget();
 	void ClearColumns();
+	void OverrideColumnStyle(const FDataTableStyleOverride& InStyle);
 	
 
 	void Construct(const FArguments& InArgs);

@@ -24,6 +24,7 @@ class DATABASE_API SDataTab : public SCompoundWidget
 	SLATE_ARGUMENT(bool, Editable)
 	SLATE_END_ARGS()
 
+
 private:
 
 	FOnDataTableChanged OnDataTableChanged;
@@ -35,8 +36,6 @@ private:
 	
 	TSharedPtr<class SScrollBox> RowContainer;
 	TArray<TSharedPtr<SDTHeaderRow>> Rows;
-	
-	
 	TArray<FDataTableFieldDescription> Fields;
 
 	void OnRowChanged(const int32& RowIndex, const int32& ColumnIndex, const FString& Value);
@@ -46,6 +45,8 @@ public:
 	virtual void UpdateWidget();
 	void SetFields(const TArray<FDataTableFieldDescription>& InFields);
 	void AddRow(TArray<FString>& Values,const bool& bUseWidgets,const bool& bIsEditable);
+
+	void SetRowStyleOverride(const int32& Index, const FDataTableStyleOverride& InStyle);
 
 	void Construct(const FArguments& InArgs);
 	~SDataTab();
