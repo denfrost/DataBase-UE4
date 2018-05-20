@@ -90,4 +90,16 @@ private:
 	TSharedPtr<class IDetailsView> DataObjectDetailsView;
 	TSharedPtr<class SDataTab> DataTableView;
 
+private:
+	void FillToolbar(FToolBarBuilder& ToolbarBuilder, const TSharedRef<FUICommandList> ToolkitCommands);
+
+	void ImportFromCSV();
+	void AddNewRow();
+
+private:
+
+	//Binds
+	void OnPropertyChanged(const FPropertyChangedEvent& PropertyChangedEvet);
+	void OnDataTableChanged(const int32& RowIndex, const int32& ColumnIndex, const FString& Value);
+
 };

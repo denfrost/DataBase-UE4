@@ -1,31 +1,26 @@
 #pragma once
 #include "EngineMinimal.h"
 #include "CoreMinimal.h"
+#include "DataTab.h"
 #include "Runtime/SlateCore/Public/Widgets/SCompoundWidget.h"
 
 class SDataTabHeader : public SCompoundWidget
 {
 	SLATE_BEGIN_ARGS(SDataTabHeader)
-		: _Style()
+		: _DataTableStyle(&FDataTableStyle::GetDefault())
+		, _VarName(FText::FromString("None"))
 	{}
 
-	SLATE_ATTRIBUTE(const FSlateBrush*, Style)
+	SLATE_ARGUMENT(const FDataTableStyle*, DataTableStyle)
 	SLATE_ARGUMENT(FText, VarName)
-	SLATE_ARGUMENT(FSlateColor, TextColor)
-	SLATE_ARGUMENT(FSlateFontInfo, FontInfo)
-	SLATE_ARGUMENT(ETextJustify::Type, Justification)
 
 	SLATE_END_ARGS()
 
 public:
 
 	TSharedPtr<class STextBlock> TextBlock;
-	ETextJustify::Type Justification;
-	TAttribute< const FSlateBrush* > Style;
-
+	const FDataTableStyle* DataTableStyle;
 	FText VariableName;
-	FSlateColor TextColor;
-	FSlateFontInfo FontInfo;
 
 	void Construct(const FArguments& InArgs);
 	~SDataTabHeader();

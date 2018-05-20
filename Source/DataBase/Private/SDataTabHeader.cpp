@@ -5,26 +5,23 @@
 
 void SDataTabHeader::Construct(const FArguments& InArgs)
 {
-	Style = InArgs._Style;
+	DataTableStyle = InArgs._DataTableStyle;
 	VariableName = InArgs._VarName;
-	TextColor = InArgs._TextColor;
-	FontInfo = InArgs._FontInfo;
-	Justification = InArgs._Justification;
 
 	ChildSlot[
 
 		SNew(SBorder)
-			.BorderImage(Style)
-			.Padding(FMargin(0, 0, 0, 0))
+/*			.BorderImage(&DataTableStyle.HeaderStyle->HeaderBrush)*/
+/*			.Padding(HeaderStyle->Margin)*/
 			[
 				SAssignNew(TextBlock, STextBlock)
 				.Text(VariableName)
-				.ColorAndOpacity(TextColor)
+/*				.ColorAndOpacity(HeaderStyle->TextColorAndOpacity)*/
 			]
 	];
 
-	TextBlock->SetFont(FontInfo);
-	TextBlock->SetJustification(Justification);
+// 	TextBlock->SetFont(HeaderStyle->Font);
+// 	TextBlock->SetJustification(HeaderStyle->Justification);
 }
 
 SDataTabHeader::~SDataTabHeader()

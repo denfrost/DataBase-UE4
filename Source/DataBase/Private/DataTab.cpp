@@ -6,17 +6,16 @@
 
 UDataTab::UDataTab()
 {
-	HeaderColumns.Init(FDataTableColumnDescription(), 1);
+
 }
 
 #if WITH_EDITOR
 void UDataTab::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
-	if (DataTable.IsValid())
+	if (DataTable.IsValid() && DataObject && !DataObject->IsPendingKill())
 	{
-		DataTable->UpdateWidget();
-		UE_LOG(LogTemp, Log, TEXT("update"));
+		DataTable->SetFields(DataObject->Fields);
 	}
 }
 
@@ -43,10 +42,21 @@ void UDataTab::SynchronizeProperties()
 
 TSharedRef<SWidget> UDataTab::RebuildWidget()
 {
-	DataTable = SNew(SDataTab)
-		.HeaderStyle(&HeaderStyle)
-		.ColumnDescriptions(HeaderColumns);
-
+	if (DataObject && !DataObject->IsPendingKill())
+	{
+		DataTable = SNew(SDataTab)
+			.DataTableStyle(&DataTableStyle)
+			.ColumnDescriptions(DataObject->Fields)
+			.DataObject(DataObject)
+			.Editable(true);
+	}
+	else
+	{
+		DataTable = SNew(SDataTab)
+			.DataTableStyle(&DataTableStyle)
+			.DataObject(DataObject)
+			.Editable(true);
+	}
 	return DataTable->AsShared();
 }
 

@@ -43,6 +43,8 @@ public class DataBase : ModuleRules
                 "UMG",
                 "InputCore",
                 "Projects",
+                "HTTP",
+                "Json",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

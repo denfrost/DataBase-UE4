@@ -14,7 +14,7 @@ enum class EDataTableTypes : uint8
 };
 
 USTRUCT(BlueprintType)
-struct FDataTableColumnDescription
+struct FDataTableFieldDescription
 {
 	GENERATED_BODY()
 
@@ -25,14 +25,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data Table", meta = (ToolTip = "Determine which type of data should be this column"))
 		EDataTableTypes Type;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data Table", meta = (ToolTip = "Allow drop box to limit your finidings"))
-		float ColumnWidth;
-
-	FDataTableColumnDescription()
+	FDataTableFieldDescription()
 	{
 		FieldName = FText::FromString("None");
 		Type = EDataTableTypes::String;
-		ColumnWidth = 1.f;
 	}
 };
 
@@ -46,10 +42,33 @@ public:
 		TArray<FString> Inputs;
 };
 
+
+USTRUCT(BlueprintType)
+struct FJsonData
+{
+	GENERATED_BODY()
+
+public:
+
+	TSharedPtr<FJsonObject> Json;
+	TSharedPtr<FJsonValue> Value;
+
+	FJsonData(){}
+
+	static const FJsonData& GetDefault() {
+		static FJsonData Default;
+		return Default;
+	};
+};
+
 UCLASS(Blueprintable)
 class DATABASE_API UDataObject : public UObject
 {
 	GENERATED_BODY()
+
+private:
+	UPROPERTY()
+		FString JsonString;
 
 public:
 
@@ -68,6 +87,38 @@ public:
 		TArray<FString> SearchTags;
 
 	UPROPERTY(EditAnywhere, Category = "Data Table Options")
-		TArray<FDataTableColumnDescription> Fields;
+		TArray<FDataTableFieldDescription> Fields;
+
+
+	void UpdateRowsAfterFields();
+
+	//JSON BEGIN
+
+	UFUNCTION(BlueprintPure, Category = "JSON")
+		static TArray<FJsonData> GetArrayField(UPARAM(ref)FJsonData& Container, const FString& Field);
+
+	UFUNCTION(BlueprintPure, Category = "JSON")
+		static FJsonData GetField(UPARAM(ref)FJsonData& Container, const FString& Field);
+
+	UFUNCTION(BlueprintPure, Category = "JSON")
+		static bool GetBoolean(UPARAM(ref)FJsonData& Container);
+
+	UFUNCTION(BlueprintPure, Category = "JSON")
+		static FString GetString(UPARAM(ref)FJsonData& Container);
+
+	UFUNCTION(BlueprintPure, Category = "JSON")
+		static int32 GetInt(UPARAM(ref) FJsonData& Container);
+
+	UFUNCTION(BlueprintPure, Category = "JSON")
+		static float GetFloat(UPARAM(ref)FJsonData& Container);
+
+	UFUNCTION(BlueprintPure, Category = "JSON")
+		static UObject* GetUObject(UPARAM(ref)FJsonData& Container);
+
+
+
+
+
+
 
 };

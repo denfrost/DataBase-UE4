@@ -34,7 +34,14 @@ void FDataObjectEditor::InitDataObject(const EToolkitMode::Type Mode, const TSha
 	GEditor->RegisterForUndo(this);
 	BindCommands();
 
-	//Create Details here
+	//Create Details View Interface
+	FPropertyEditorModule& PropertyEditorModule = FModuleManager::GetModuleChecked<FPropertyEditorModule>("PropertyEditor");
+	const FDetailsViewArgs DetailsViewArgs(false, false, true, FDetailsViewArgs::HideNameArea, true);
+	DataObjectDetailsView = PropertyEditorModule.CreateDetailView(DetailsViewArgs);
+	DataObjectDetailsView->SetObject(DataObject);
+
+	//Bind On Property Changed
+	DataObjectDetailsView->OnFinishedChangingProperties().AddSP(this, &FDataObjectEditor::OnPropertyChanged);
 
 
 	// create tab layout
@@ -178,34 +185,54 @@ void FDataObjectEditor::BindCommands()
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
 void FDataObjectEditor::ExtendToolBar()
 {
-	/*	FUIAction CompileFunction(FExecuteAction::CreateSP(this, &FHLSLEditorToolKit::Compile));*/
-	struct Local
-	{
-		static void FillToolbar(FToolBarBuilder& ToolbarBuilder, const TSharedRef<FUICommandList> ToolkitCommands)
-		{
-
-			ToolbarBuilder.BeginSection("Export options");
-			{
-
-			}
-			ToolbarBuilder.EndSection();
-		}
-	};
-
-
 	TSharedPtr<FExtender> ToolbarExtender = MakeShareable(new FExtender);
 
 	ToolbarExtender->AddToolBarExtension(
 		"Asset",
 		EExtensionHook::After,
 		GetToolkitCommands(),
-		FToolBarExtensionDelegate::CreateStatic(&Local::FillToolbar, GetToolkitCommands())
+		FToolBarExtensionDelegate::CreateSP(this, &FDataObjectEditor::FillToolbar, GetToolkitCommands())
 	);
 
 	AddToolbarExtender(ToolbarExtender);
 }
+
+void FDataObjectEditor::FillToolbar(FToolBarBuilder& ToolbarBuilder, const TSharedRef<FUICommandList> ToolkitCommands)
+{
+	ToolbarBuilder.BeginSection("Import options");
+	{
+		//Import from CSV file
+		FUIAction ImportCSV(FExecuteAction::CreateSP(this, &FDataObjectEditor::ImportFromCSV));
+		ToolbarBuilder.AddToolBarButton(ImportCSV, TEXT("Import from CSV"), FText::FromString("FromCSV"), FText::FromString("Import data directly from a csv table"));
+
+		//Add New row
+		FUIAction AddNewRow(FExecuteAction::CreateSP(this, &FDataObjectEditor::AddNewRow));
+		ToolbarBuilder.AddToolBarButton(AddNewRow, TEXT("Add Row"), FText::FromString("Add Row"), FText::FromString("Add A new row to your table"));
+	}
+	ToolbarBuilder.EndSection();
+}
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
+void FDataObjectEditor::ImportFromCSV()
+{
+	UE_LOG(LogTemp, Log, TEXT("yeah"));
+}
+
+
+void FDataObjectEditor::AddNewRow()
+{
+	ensure(DataObject && DataTableView.IsValid());
+	TArray<FString> RowEmptyValues;
+	RowEmptyValues.Init("", DataObject->Fields.Num());
+	DataTableView->AddRow(RowEmptyValues, DataObject->bUseCustomWidgets,true);
+
+	//Add new empty Data to Our Object
+	FRowData NewDataRow;
+	NewDataRow.Inputs = RowEmptyValues;
+	DataObject->Data.Add(NewDataRow);
+
+	DataObject->MarkPackageDirty();
+}
 
 TSharedRef<SDockTab> FDataObjectEditor::HandleTabManagerSpawnTab(const FSpawnTabArgs& Args, FName TabIdentifier)
 {
@@ -214,7 +241,10 @@ TSharedRef<SDockTab> FDataObjectEditor::HandleTabManagerSpawnTab(const FSpawnTab
 	if (TabIdentifier == EditableDataObjectToolKit::DataTableTab)
 	{
 		DataTableView = SNew(SDataTab)
-			.ColumnDescriptions(DataObject->Fields);
+			.ColumnDescriptions(DataObject->Fields)
+			.OnDataTableChanged(this, &FDataObjectEditor::OnDataTableChanged)
+			.DataObject(DataObject)
+			.Editable(false);
 
 		return SNew(SDockTab)
 			.TabRole(ETabRole::PanelTab)
@@ -225,10 +255,6 @@ TSharedRef<SDockTab> FDataObjectEditor::HandleTabManagerSpawnTab(const FSpawnTab
 
 	if (TabIdentifier == EditableDataObjectToolKit::DetailsViewTab)
 	{
-		FPropertyEditorModule& PropertyEditorModule = FModuleManager::GetModuleChecked<FPropertyEditorModule>("PropertyEditor");
-		const FDetailsViewArgs DetailsViewArgs(false, false, true, FDetailsViewArgs::HideNameArea, true);
-		DataObjectDetailsView = PropertyEditorModule.CreateDetailView(DetailsViewArgs);
-		DataObjectDetailsView->SetObject(DataObject);
 		return SNew(SDockTab)
 			.TabRole(ETabRole::PanelTab)
 			[
@@ -250,5 +276,24 @@ TSharedRef<SWidget> FDataObjectEditor::GenPrimitivesTab()
 	FToolBarBuilder ToolbarBuilder(commands, FMultiBoxCustomization::None);
 	//ToolbarBuilder.AddWidget(GenShelfButton());
 	return ToolbarBuilder.MakeWidget();
+}
+
+void FDataObjectEditor::OnPropertyChanged(const FPropertyChangedEvent& PropertyChangedEvet)
+{
+	ensure(DataObject && DataTableView.IsValid());
+
+	DataTableView->SetFields(DataObject->Fields);
+	DataObject->MarkPackageDirty();
+}
+
+void FDataObjectEditor::OnDataTableChanged(const int32& RowIndex, const int32& ColumnIndex, const FString& Value)
+{
+	if (DataObject && DataObject->Data.IsValidIndex(RowIndex) && DataObject->Data[RowIndex].Inputs.IsValidIndex(ColumnIndex))
+	{
+		DataObject->Data[RowIndex].Inputs[ColumnIndex] = Value;
+		DataObject->MarkPackageDirty();
+		return;
+	}
+	UE_LOG(LogTemp, Error, TEXT("Invalid Entry Row: %i , Column: %i , Value: %s"), RowIndex, ColumnIndex, *Value);
 }
 
