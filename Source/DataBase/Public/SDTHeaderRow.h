@@ -6,6 +6,7 @@
 #include "Runtime/SlateCore/Public/Widgets/SCompoundWidget.h"
 
 DECLARE_DELEGATE_ThreeParams(FOnDTRowChanged, const int32&, const int32&, const FString&)
+DECLARE_DELEGATE_TwoParams(FOnRowClicked, const int32&,const TArray<FString>&)
 
 class SDTHeaderRow : public SCompoundWidget
 {
@@ -24,6 +25,8 @@ class SDTHeaderRow : public SCompoundWidget
 	SLATE_ARGUMENT(bool, Editable)
 	SLATE_ARGUMENT(int32, RowIndex)
 	SLATE_EVENT(FOnDTRowChanged, OnDTRowChanged)
+	SLATE_EVENT(FOnRowClicked, OnRowClicked)
+	SLATE_EVENT(FOnRowClicked, OnRowDoubleClicked)
 		
 	SLATE_END_ARGS()
 
@@ -31,6 +34,8 @@ private:
 	TArray<FString> Values;
 	TArray<FDataTableFieldDescription> Fields;
 	FOnDTRowChanged OnDTRowChanged;
+	FOnRowClicked OnRowClicked;
+	FOnRowClicked OnRowDoubleClicked;
 
 	const FDataTableStyle* DataTableStyle;
 	int32 RowIndex;

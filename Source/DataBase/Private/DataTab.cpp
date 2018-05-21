@@ -56,15 +56,35 @@ TSharedRef<SWidget> UDataTab::RebuildWidget()
 			.DataTableStyle(&DataTableStyle)
 			.ColumnDescriptions(DataObject->Fields)
 			.DataObject(DataObject)
-			.Editable(false);
+			.Editable(false)
+			.OnRowClicked(BIND_UOBJECT_DELEGATE(FOnDTRowClicked, OnRowClicked))
+			.OnRowDoubleClicked(BIND_UOBJECT_DELEGATE(FOnDTRowClicked, OnRowDoubleClicked));
 	}
 	else
 	{
 		DataTable = SNew(SDataTab)
 			.DataTableStyle(&DataTableStyle)
 			.DataObject(DataObject)
-			.Editable(false);
+			.Editable(false)
+			.OnRowClicked(BIND_UOBJECT_DELEGATE(FOnDTRowClicked, OnRowClicked))
+			.OnRowDoubleClicked(BIND_UOBJECT_DELEGATE(FOnDTRowClicked, OnRowDoubleClicked));
 	}
 	return DataTable->AsShared();
+}
+
+void UDataTab::OnRowClicked(const int32& RowIndex, const TArray<FString>& Values)
+{
+	if (OnDataTableRowClicked.IsBound())
+	{
+		OnDataTableRowClicked.Broadcast(RowIndex, Values);
+	}
+}
+
+void UDataTab::OnRowDoubleClicked(const int32& RowIndex, const TArray<FString>& Values)
+{
+	if (OnDataTableRowDoubleClicked.IsBound())
+	{
+		OnDataTableRowDoubleClicked.Broadcast(RowIndex, Values);
+	}
 }
 

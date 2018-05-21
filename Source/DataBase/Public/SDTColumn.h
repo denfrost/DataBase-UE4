@@ -31,7 +31,7 @@ public:
 	int32 RowIndex;
 	int32 ColumnIndex;
 	TSharedPtr<class STextBlock> TextBox;
-	TSharedPtr<class SEditableTextBox> EditableTexBox;
+	TSharedPtr<class SEditableTextBox> EditableTextBox;
 
 	FOnColumnChanged OnColumnChanged;
 

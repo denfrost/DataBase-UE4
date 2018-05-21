@@ -8,6 +8,7 @@ class SDataTabHeader;
 class SDataTableRow;
 
 DECLARE_DELEGATE_ThreeParams(FOnDataTableChanged, const int32&, const int32&, const FString&);
+DECLARE_DELEGATE_TwoParams(FOnDTRowClicked, const int32&, const TArray<FString>&)
 
 class DATABASE_API SDataTab : public SCompoundWidget
 {
@@ -19,14 +20,17 @@ class DATABASE_API SDataTab : public SCompoundWidget
 	/** Header Styler*/
 	SLATE_ARGUMENT(const FDataTableStyle*, DataTableStyle)
 	SLATE_ARGUMENT(TArray<FDataTableFieldDescription>, ColumnDescriptions)
-	SLATE_EVENT(FOnDataTableChanged, OnDataTableChanged)
 	SLATE_ARGUMENT(TWeakObjectPtr<class UDataObject>, DataObject)
 	SLATE_ARGUMENT(bool, Editable)
+	SLATE_EVENT(FOnDataTableChanged, OnDataTableChanged)
+	SLATE_EVENT(FOnDTRowClicked, OnRowClicked)
+	SLATE_EVENT(FOnDTRowClicked, OnRowDoubleClicked)
 	SLATE_END_ARGS()
 
 
 private:
-
+	FOnDTRowClicked OnRowClick;
+	FOnDTRowClicked OnRowDoubleClick;
 	FOnDataTableChanged OnDataTableChanged;
 	TWeakObjectPtr<class UDataObject> CurrentDataObject;
 	bool bIsEditable;
@@ -39,6 +43,8 @@ private:
 	TArray<FDataTableFieldDescription> Fields;
 
 	void OnRowChanged(const int32& RowIndex, const int32& ColumnIndex, const FString& Value);
+	void OnRowClicked(const int32& RowIndex, const TArray<FString>& Values);
+	void OnRowDoubleClicked(const int32& RowIndex, const TArray<FString>& Values);
 
 public:
 	//DataTab

@@ -5,7 +5,15 @@
 
 FReply SDTHeaderRow::OnMouseButtonDoubleClick(const FGeometry& InMyGeometry, const FPointerEvent& InMouseEvent)
 {
-	
+	if (IsEnabled() && (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton || InMouseEvent.IsTouchEvent()))
+	{
+		if (!bIsMaster)
+		{
+			BackgroundBorder->SetBorderImage(&DataTableStyle->BodyStyle.Pressed);
+		}
+		OnRowDoubleClicked.ExecuteIfBound(RowIndex, Values);
+		return FReply::Handled();
+	}
 	return FReply::Unhandled();
 }
 
@@ -17,6 +25,7 @@ FReply SDTHeaderRow::OnMouseButtonDown(const FGeometry& MyGeometry, const FPoint
 		{
 			BackgroundBorder->SetBorderImage(&DataTableStyle->BodyStyle.Pressed);
 		}
+		OnRowClicked.ExecuteIfBound(RowIndex, Values);
 		return FReply::Handled();
 	}
 	return FReply::Unhandled();
@@ -46,7 +55,7 @@ FReply SDTHeaderRow::OnMouseButtonUp(const FGeometry& MyGeometry, const FPointer
 
 void SDTHeaderRow::OnMouseEnter(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
-	if (!bIsMaster)
+	if (!bIsMaster && !bIsEditable)
 	{
 		BackgroundBorder->SetBorderImage(&DataTableStyle->BodyStyle.Hovered);
 	}
@@ -54,7 +63,7 @@ void SDTHeaderRow::OnMouseEnter(const FGeometry& MyGeometry, const FPointerEvent
 
 void SDTHeaderRow::OnMouseLeave(const FPointerEvent& MouseEvent)
 {
-	if (!bIsMaster)
+	if (!bIsMaster && !bIsEditable)
 	{
 		BackgroundBorder->SetBorderImage(&DataTableStyle->BodyStyle.Normal);
 	}
@@ -70,14 +79,14 @@ void SDTHeaderRow::SetColumns(const TArray<FDataTableFieldDescription>& InFields
 void SDTHeaderRow::UpdateWidget()
 {
 	ClearColumns();
-	if (!bIsMaster)
-	{
-		ensure(Values.Num() == Fields.Num());
-	}
-
 	for (int32 i = 0; i < Fields.Num(); i++)
 	{
 		ensure(!ColumnIDs.Contains(i));
+		if (!Values.IsValidIndex(i))
+		{
+			Values.Add("");
+		}
+
 		SHorizontalBox::FSlot& PosSlot = MainContainer->AddSlot().Padding((bIsMaster) ? DataTableStyle->HeaderStyle.Margin : DataTableStyle->BodyStyle.GeneralMargin);
 		
 		TSharedPtr<SDTColumn> Col;
@@ -127,7 +136,11 @@ void SDTHeaderRow::OverrideColumnStyle(const FDataTableStyleOverride& InStyle)
 
 void SDTHeaderRow::OnColumnChanged(const int32& ColumnIndex, const FString& Value)
 {
-	OnDTRowChanged.ExecuteIfBound(RowIndex, ColumnIndex, Value);
+	if (OnDTRowChanged.IsBound())
+	{
+		OnDTRowChanged.ExecuteIfBound(RowIndex, ColumnIndex, Value);
+		UE_LOG(LogTemp, Log, TEXT("Row"));;
+	}
 }
 
 void SDTHeaderRow::Construct(const FArguments& InArgs)
@@ -138,20 +151,21 @@ void SDTHeaderRow::Construct(const FArguments& InArgs)
 	DataTableStyle = InArgs._DataTableStyle;
 	bIsEditable = InArgs._Editable;
 	bIsMaster = InArgs._bIsMaster;
-
-	const FSlateBrush* BG = (bIsMaster) ? &DataTableStyle->HeaderStyle.HeaderBrush : &DataTableStyle->BodyStyle.Normal;
+	OnDTRowChanged = InArgs._OnDTRowChanged;
+	OnRowClicked = InArgs._OnRowClicked;
+	OnRowDoubleClicked = InArgs._OnRowDoubleClicked;
 
 	ChildSlot
 		[
 			SAssignNew(BackgroundBorder, SBorder)
 			.HAlign(HAlign_Fill)
-			.BorderImage(BG)
+			.BorderImage((bIsMaster) ? &DataTableStyle->HeaderStyle.HeaderBrush : &DataTableStyle->BodyStyle.Normal)
 			[
 				SAssignNew(MainContainer, SHorizontalBox)
 			]
 		];
 
-	UpdateWidget();
+/*	UpdateWidget();*/
 }
 
 SDTHeaderRow::~SDTHeaderRow()

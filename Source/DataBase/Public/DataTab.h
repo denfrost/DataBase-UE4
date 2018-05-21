@@ -173,6 +173,7 @@ public:
 };
 
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDataTableRowClicked, int32, Index, TArray<FString>, Values);
 
 
 UCLASS()
@@ -192,6 +193,13 @@ protected:
 	TSharedPtr<class SDataTab> DataTable;
 public:
 
+	UPROPERTY(BlueprintAssignable, Category = "Data Table")
+		FOnDataTableRowClicked OnDataTableRowClicked;
+
+	UPROPERTY(BlueprintAssignable, Category = "Data Table")
+		FOnDataTableRowClicked OnDataTableRowDoubleClicked;
+
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data Table")
 		UDataObject* DataObject;
 
@@ -208,4 +216,7 @@ public:
 protected:
 	virtual TSharedRef<SWidget> RebuildWidget() override;
 
+private:
+	void OnRowClicked(const int32& RowIndex, const TArray<FString>& Values);
+	void OnRowDoubleClicked(const int32& RowIndex, const TArray<FString>& Values);
 };

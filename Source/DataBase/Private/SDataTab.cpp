@@ -8,6 +8,16 @@ void SDataTab::OnRowChanged(const int32& RowIndex, const int32& ColumnIndex, con
 	OnDataTableChanged.ExecuteIfBound(RowIndex, ColumnIndex, Value);
 }
 
+void SDataTab::OnRowClicked(const int32& RowIndex, const TArray<FString>& Values)
+{
+	OnRowClick.ExecuteIfBound(RowIndex, Values);
+}
+
+void SDataTab::OnRowDoubleClicked(const int32& RowIndex, const TArray<FString>& Values)
+{
+	OnRowDoubleClick.ExecuteIfBound(RowIndex, Values);
+}
+
 void SDataTab::UpdateWidget()
 {
 	Header->SetColumns(Fields, TArray<FString>());
@@ -58,12 +68,15 @@ void SDataTab::AddRow(TArray<FString>& Values,const bool& bUseWidgets,const bool
 			.DataTableStyle(DataTableStyle)
 			.RowIndex(RowIndex)
 			.Fields(Fields)
-			.OnDTRowChanged(this, &SDataTab::OnRowChanged)
 			.Editable(bIsEditable)
 			.bIsMaster(false)
+			.OnDTRowChanged(this, &SDataTab::OnRowChanged)
+			.OnRowClicked(this, &SDataTab::OnRowClicked)
+			.OnRowDoubleClicked(this, &SDataTab::OnRowDoubleClicked)
 	];
-
+	
 	check(NewRow.IsValid());
+	NewRow->UpdateWidget();
 	Rows.Add(NewRow);
 }
 
@@ -84,7 +97,8 @@ void SDataTab::Construct(const FArguments& InArgs)
 	bIsEditable = InArgs._Editable;
 	DataTableStyle = InArgs._DataTableStyle;
 	Fields = InArgs._ColumnDescriptions;
-
+	OnRowClick = InArgs._OnRowClicked;
+	OnRowDoubleClick = InArgs._OnRowDoubleClicked;
 
 	ChildSlot[
 		SNew(SVerticalBox)

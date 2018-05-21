@@ -4,7 +4,10 @@
 
 void SDTColumn::OnTextCommitted(const FText& InText, ETextCommit::Type CommitedType)
 {
-	OnColumnChanged.ExecuteIfBound( ColumnIndex, InText.ToString());
+	if (OnColumnChanged.IsBound())
+	{
+		OnColumnChanged.Execute(ColumnIndex, InText.ToString());
+	}
 }
 
 void SDTColumn::SetFontAndColor(const FDataTableStyleOverride& InDTStyleOverride)
@@ -26,19 +29,23 @@ void SDTColumn::Construct(const FArguments& InArgs)
 	ColumnIndex = InArgs._ColumnIndex;
 	bIsMaster = InArgs._bIsMaster;
 
-	if (bIsMaster)
+	if (!bIsEditable)
 	{
-		
-	}
-	
-	ChildSlot[
+		ChildSlot[
 			SAssignNew(TextBox, STextBlock)
-			.ColorAndOpacity((bIsMaster) ? DataTableStyle->HeaderStyle.TextColorAndOpacity : DataTableStyle->BodyStyle.TextColorAndOpacity)
-			.Text(Value)
-	];
+				.ColorAndOpacity((bIsMaster) ? DataTableStyle->HeaderStyle.TextColorAndOpacity : DataTableStyle->BodyStyle.TextColorAndOpacity)
+				.Text(Value)
+		];
 
-	TextBox->SetFont((bIsMaster) ? DataTableStyle->HeaderStyle.Font : DataTableStyle->BodyStyle.Font);
-	TextBox->SetJustification((bIsMaster) ? DataTableStyle->HeaderStyle.Justification : DataTableStyle->BodyStyle.Justification);
+		TextBox->SetFont((bIsMaster) ? DataTableStyle->HeaderStyle.Font : DataTableStyle->BodyStyle.Font);
+		TextBox->SetJustification((bIsMaster) ? DataTableStyle->HeaderStyle.Justification : DataTableStyle->BodyStyle.Justification);
+	}
+	else
+	{
+		ChildSlot[
+			SAssignNew(EditableTextBox, SEditableTextBox).OnTextCommitted(this, &SDTColumn::OnTextCommitted).Text(Value)
+		];
+	}	
 }
 
 SDTColumn::~SDTColumn()
