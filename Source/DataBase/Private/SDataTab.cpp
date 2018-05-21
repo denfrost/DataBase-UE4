@@ -46,7 +46,7 @@ void SDataTab::SetFields(const TArray<FDataTableFieldDescription>& InFields)
 	UpdateWidget();
 }
 
-void SDataTab::AddRow(TArray<FString>& Values,const bool& bUseWidgets,const bool& bIsEditable)
+void SDataTab::AddRow(TArray<FString>& Values,const bool& bUseWidgets,const bool& IsEditable)
 {
 	check(RowContainer.IsValid());
 
@@ -68,7 +68,7 @@ void SDataTab::AddRow(TArray<FString>& Values,const bool& bUseWidgets,const bool
 			.DataTableStyle(DataTableStyle)
 			.RowIndex(RowIndex)
 			.Fields(Fields)
-			.Editable(bIsEditable)
+			.Editable(IsEditable)
 			.bIsMaster(false)
 			.OnDTRowChanged(this, &SDataTab::OnRowChanged)
 			.OnRowClicked(this, &SDataTab::OnRowClicked)

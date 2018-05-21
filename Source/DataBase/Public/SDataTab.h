@@ -19,19 +19,34 @@ class DATABASE_API SDataTab : public SCompoundWidget
 	{}
 	/** Header Styler*/
 	SLATE_ARGUMENT(const FDataTableStyle*, DataTableStyle)
+
+	/*Field Description basically is varible type with name*/
 	SLATE_ARGUMENT(TArray<FDataTableFieldDescription>, ColumnDescriptions)
+
+	/*Your Data Object this is mandatory*/
 	SLATE_ARGUMENT(TWeakObjectPtr<class UDataObject>, DataObject)
+
+	/*Is this widget able to edit the Data Object otherwise is a widget for UMG*/
 	SLATE_ARGUMENT(bool, Editable)
+
+	/*Trigger when a field entry values was modified*/
 	SLATE_EVENT(FOnDataTableChanged, OnDataTableChanged)
+
+	/*For UMG whever a row is click, will return the Index and the Values as FString Contained here*/
 	SLATE_EVENT(FOnDTRowClicked, OnRowClicked)
+
+	/*For UMG whever a row is click, will return the Index and the Values as FString Contained here*/
 	SLATE_EVENT(FOnDTRowClicked, OnRowDoubleClicked)
 	SLATE_END_ARGS()
 
 
 private:
+	/*Delegates*/
 	FOnDTRowClicked OnRowClick;
 	FOnDTRowClicked OnRowDoubleClick;
 	FOnDataTableChanged OnDataTableChanged;
+
+
 	TWeakObjectPtr<class UDataObject> CurrentDataObject;
 	bool bIsEditable;
 
@@ -50,7 +65,7 @@ public:
 	//DataTab
 	virtual void UpdateWidget();
 	void SetFields(const TArray<FDataTableFieldDescription>& InFields);
-	void AddRow(TArray<FString>& Values,const bool& bUseWidgets,const bool& bIsEditable);
+	void AddRow(TArray<FString>& Values,const bool& bUseWidgets,const bool& IsEditable);
 
 	void SetRowStyleOverride(const int32& Index, const FDataTableStyleOverride& InStyle);
 
