@@ -5,6 +5,8 @@
 
 FReply SDTHeaderRow::OnMouseButtonDoubleClick(const FGeometry& InMyGeometry, const FPointerEvent& InMouseEvent)
 {
+	if (bIsEditable) return  FReply::Handled();
+
 	if (IsEnabled() && (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton || InMouseEvent.IsTouchEvent()))
 	{
 		if (!bIsMaster)
@@ -19,6 +21,8 @@ FReply SDTHeaderRow::OnMouseButtonDoubleClick(const FGeometry& InMyGeometry, con
 
 FReply SDTHeaderRow::OnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
+	if (bIsEditable) return  FReply::Handled();
+
 	if (IsEnabled() && (MouseEvent.GetEffectingButton() == EKeys::LeftMouseButton || MouseEvent.IsTouchEvent()))
 	{
 		if (!bIsMaster)
@@ -33,6 +37,8 @@ FReply SDTHeaderRow::OnMouseButtonDown(const FGeometry& MyGeometry, const FPoint
 
 FReply SDTHeaderRow::OnMouseButtonUp(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
+	if (bIsEditable) return  FReply::Handled();
+
 	if (IsEnabled() && (MouseEvent.GetEffectingButton() == EKeys::LeftMouseButton || MouseEvent.IsTouchEvent()))
 	{
 		if (!bIsMaster)
@@ -55,6 +61,8 @@ FReply SDTHeaderRow::OnMouseButtonUp(const FGeometry& MyGeometry, const FPointer
 
 void SDTHeaderRow::OnMouseEnter(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
+	if (bIsEditable) return;
+
 	if (!bIsMaster && !bIsEditable)
 	{
 		BackgroundBorder->SetBorderImage(&DataTableStyle->BodyStyle.Hovered);
@@ -63,6 +71,8 @@ void SDTHeaderRow::OnMouseEnter(const FGeometry& MyGeometry, const FPointerEvent
 
 void SDTHeaderRow::OnMouseLeave(const FPointerEvent& MouseEvent)
 {
+	if (bIsEditable) return;
+
 	if (!bIsMaster && !bIsEditable)
 	{
 		BackgroundBorder->SetBorderImage(&DataTableStyle->BodyStyle.Normal);

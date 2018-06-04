@@ -60,6 +60,11 @@ void UDataObject::CastUpdate()
 	}
 }
 
+void UDataObject::ValuesToRowData(const TArray<FString> Values, FRowData& OutData)
+{
+	OutData.Inputs = Values;
+}
+
 TArray<FJsonValueBP> UDataObject::GetJsonArrayField(UPARAM(ref) FJsonData& Container, const FString& Field)
 {
 	if (Container.Json.IsValid())

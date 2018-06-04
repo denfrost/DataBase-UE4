@@ -4,6 +4,7 @@
 #include "Widgets/SWidget.h"
 #include "Runtime/UMG/Public/UMG.h"
 #include "DataObject.h"
+#include "Runtime/SlateCore/Public/Styling/CoreStyle.h"
 #include "DataTab.generated.h"
 
 
@@ -168,6 +169,29 @@ public:
 
 	static const FDataTableStyle& GetDefault() {
 		static FDataTableStyle Default;
+		return Default;
+	};
+};
+
+USTRUCT()
+struct FDataTableEditableTextStyle
+{
+	GENERATED_BODY()
+
+public:
+	FEditableTextBoxStyle EditableTextStyle;
+
+	FDataTableEditableTextStyle()
+	{
+		EditableTextStyle = FCoreStyle::Get().GetWidgetStyle< FEditableTextBoxStyle >("NormalEditableTextBox");
+		EditableTextStyle.BackgroundImageNormal.TintColor = FSlateColor(FLinearColor(.05f, .05f, .05f, 1));
+		EditableTextStyle.ForegroundColor = FSlateColor(FLinearColor(1, 1, 1, 1));
+		EditableTextStyle.BackgroundImageHovered.TintColor = FSlateColor(FLinearColor(.5f, .5f, .5f, .5f));
+		EditableTextStyle.BackgroundImageFocused.TintColor = FSlateColor(FLinearColor(.2f, .2f, .2f, .2f));
+	}
+
+	static const FDataTableEditableTextStyle& GetDefault() {
+		static FDataTableEditableTextStyle Default;
 		return Default;
 	};
 };

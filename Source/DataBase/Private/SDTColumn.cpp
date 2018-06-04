@@ -43,7 +43,10 @@ void SDTColumn::Construct(const FArguments& InArgs)
 	else
 	{
 		ChildSlot[
-			SAssignNew(EditableTextBox, SEditableTextBox).OnTextCommitted(this, &SDTColumn::OnTextCommitted).Text(Value)
+			SAssignNew(EditableTextBox, SEditableTextBox)
+				.Style(&FDataTableEditableTextStyle::GetDefault().EditableTextStyle)
+				.OnTextCommitted(this, &SDTColumn::OnTextCommitted)
+				.Text(Value)
 		];
 	}	
 }

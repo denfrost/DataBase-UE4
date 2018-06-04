@@ -127,6 +127,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "DataTable")
 		void CastUpdate();
 
+	UFUNCTION(BlueprintPure, Category = "DataTable")
+		static void ValuesToRowData(const TArray<FString> Values, FRowData& OutData);
+
 	UPROPERTY(BlueprintAssignable, Category = "DataTable")
 		FUpdateDataTable OnDataTableUpdate;
 

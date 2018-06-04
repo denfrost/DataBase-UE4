@@ -48,6 +48,7 @@ public class DataBaseEditor : ModuleRules
                 "Core",
                 "EditorStyle",
                 "PropertyEditor",
+                "BlueprintGraph",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
