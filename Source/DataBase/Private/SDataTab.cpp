@@ -108,6 +108,7 @@ void SDataTab::Construct(const FArguments& InArgs)
 		[
 			SAssignNew(Header, SDTHeaderRow)
 				.DataTableStyle(DataTableStyle)
+				.Editable(bIsEditable)
 				.Fields(Fields)
 				.bIsMaster(true)
 		]

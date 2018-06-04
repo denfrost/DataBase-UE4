@@ -213,6 +213,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Data Table")
 		void SetRowStyleOverride(int32 Index, const FDataTableStyleOverride& InStyle);
 
+
 protected:
 	virtual TSharedRef<SWidget> RebuildWidget() override;
 

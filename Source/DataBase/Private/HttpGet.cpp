@@ -43,7 +43,7 @@ UHttpGET* UHttpGET::GetRequest(FString URL, const TArray<FHttpHeader>& Headers)
 
 void UHttpGET::HandleRequest(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded)
 {
-	if (bSucceeded && HttpResponse.IsValid() && HttpResponse->GetContentLength() > 0 && EHttpResponseCodes::IsOk(HttpResponse->GetResponseCode()))
+	if (bSucceeded && HttpResponse.IsValid() && EHttpResponseCodes::IsOk(HttpResponse->GetResponseCode()))
 	{
 		FJsonData Json;
 		Json.Json = MakeShareable(new FJsonObject());
@@ -56,6 +56,8 @@ void UHttpGET::HandleRequest(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpR
 		OnFail.Broadcast(FJsonData::GetDefault(), "Error: Deserialize");
 		return;
 	}
+
+	UE_LOG(LogTemp, Error, TEXT("Request Code Error: %i"), HttpResponse->GetResponseCode());
 	OnFail.Broadcast(FJsonData::GetDefault(), HttpResponse->GetContentAsString());
 }
 

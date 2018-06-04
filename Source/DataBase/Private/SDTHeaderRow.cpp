@@ -81,6 +81,15 @@ void SDTHeaderRow::UpdateWidget()
 	ClearColumns();
 	for (int32 i = 0; i < Fields.Num(); i++)
 	{
+
+		if (!bIsEditable)
+		{
+			if (Fields[i].bHidden)
+			{
+				continue;
+			}
+		}
+
 		ensure(!ColumnIDs.Contains(i));
 		if (!Values.IsValidIndex(i))
 		{

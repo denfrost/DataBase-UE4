@@ -25,104 +25,178 @@ void UDataObject::UpdateRowsAfterFields()
 	}
 }
 
-TArray<FJsonData> UDataObject::GetArrayField(UPARAM(ref) FJsonData& Container, const FString& Field)
+void UDataObject::ClearDataTable()
+{
+	Data.Empty();
+}
+
+EDataTableStatus UDataObject::AddRowInfo(const FRowData& InRow)
+{
+	if (InRow.Inputs.Num() == Fields.Num())
+	{
+		Data.Add(InRow);
+		return EDataTableStatus::Ok;
+	}
+
+	if (InRow.Inputs.Num() > Fields.Num())
+	{
+		FRowData Temp;
+		for (int32 i = 0; i < Fields.Num(); i++)
+		{
+			Temp.Inputs.Add(InRow.Inputs[i]);
+		}
+		Data.Add(Temp);
+		return EDataTableStatus::OkPlusExtra;
+	}
+
+	return EDataTableStatus::Fail;
+}
+
+void UDataObject::CastUpdate()
+{
+	if (OnDataTableUpdate.IsBound())
+	{
+		OnDataTableUpdate.Broadcast(true);
+	}
+}
+
+TArray<FJsonValueBP> UDataObject::GetJsonArrayField(UPARAM(ref) FJsonData& Container, const FString& Field)
 {
 	if (Container.Json.IsValid())
 	{
-		TArray<FJsonData> NewObjs;
+		TArray<FJsonValueBP> NewValues;
 		TArray<TSharedPtr<FJsonValue>> objArray = Container.Json->GetArrayField(Field);
+
 		for (int32 i = 0; i < objArray.Num(); i++)
 		{
-			FJsonData newObject;
-			newObject.Json = Container.Json->GetObjectField(Field);
-			newObject.Value = objArray[i];
-			NewObjs.Add(newObject);
+			FJsonValueBP NewValue;
+			NewValue.Value = objArray[i];
+			NewValues.Add(NewValue);
 		}
-		return NewObjs;
+		return NewValues;
 	}
 	UE_LOG(LogTemp, Error, TEXT("ERROR : (UJJSON::getArrayField) no valid json object to extract field"));
-	return TArray<FJsonData>();
+	return TArray<FJsonValueBP>();
 }
 
-FJsonData UDataObject::GetField(UPARAM(ref) FJsonData& Container, const FString& Field)
+FJsonData UDataObject::ValueAsJsonObject(FJsonValueBP& InValue)
+{
+	if (InValue.Value.IsValid())
+	{
+		FJsonData NewJson;
+		NewJson.Json = InValue.Value->AsObject();
+		return NewJson;
+	}
+	return FJsonData::GetDefault();
+}
+
+FJsonData UDataObject::GetJsonField(UPARAM(ref) FJsonData& Container, const FString& Field)
 {
 	if (Container.Json.IsValid())
 	{
 		FJsonData SubJson;
 		SubJson.Json = Container.Json->GetObjectField(Field);
-		SubJson.Value = Container.Json->TryGetField(Field);
 		return SubJson;
 	}
 	UE_LOG(LogTemp, Error, TEXT("ERROR : (UJJSON::getField) no valid json object to extract field"));
 	return FJsonData::GetDefault();
 }
 
-bool UDataObject::GetBoolean(UPARAM(ref) FJsonData& Container)
+FJsonData UDataObject::GetJsonObject(UPARAM(ref) FJsonData& Container, const FString& Field)
 {
-	if (Container.Value.IsValid())
+	if (Container.Json.IsValid())
 	{
-		bool output;
-		if (Container.Value->TryGetBool(output))
+		for (auto& in : Container.Json->Values)
 		{
-			return output;
+			FJsonData NewJson;
+			NewJson.Json = in.Value->AsObject();
+			return NewJson;
+			break;
 		}
-		UE_LOG(LogTemp, Error, TEXT("ERROR : (UJJSON::getString) no valid value in this json"));
-		return "";
 	}
-	UE_LOG(LogTemp, Error, TEXT("ERROR : (UJJSON::getString) no valid json object to extract string"));
-	return false;
+	return FJsonData::GetDefault();
 }
 
-FString UDataObject::GetString(UPARAM(ref)FJsonData& Container)
+FString UDataObject::GetJsonString(UPARAM(ref)FJsonData& Container, const FString& InField)
 {
-	if (Container.Value.IsValid())
+	if (Container.Json.IsValid())
 	{
-		FString output;
-		if (Container.Value->TryGetString(output))
+		FString Value;
+		if (Container.Json->TryGetStringField(InField, Value))
 		{
-			return output;
+			return Value;
 		}
-		UE_LOG(LogTemp, Error, TEXT("ERROR : (UJJSON::getString) no valid value in this json"));
 		return "";
+
+// 		for (auto& in : Container.Json->Values)
+// 		{
+// 			UE_LOG(LogTemp, Warning, TEXT("value yeah %s"), *in.Key);
+// 		}
 	}
-	UE_LOG(LogTemp, Error, TEXT("ERROR : (UJJSON::getString) no valid json object to extract string"));
+
+	// 	if (Container.Value.IsValid())
+	// 	{
+	// 		FString output;
+	// 		if (Container.Value->TryGetString(output))
+	// 		{
+	// 			return output;
+	// 		}
+	// 		UE_LOG(LogTemp, Error, TEXT("ERROR : (UJJSON::getString) no valid value in this json"));
+	// 		return "";
+	// 	}
+	// 	UE_LOG(LogTemp, Error, TEXT("ERROR : (UJJSON::getString) no valid json object to extract string"));
 	return "";
 }
 
-int32 UDataObject::GetInt(UPARAM(ref) FJsonData& Container)
+bool UDataObject::GetJsonBoolean(UPARAM(ref) FJsonData& Container)
 {
-	if (Container.Value.IsValid())
-	{
-		int32 output;
-		if (Container.Value->TryGetNumber(output))
-		{
-			return output;
-		}
-		UE_LOG(LogTemp, Error, TEXT("ERROR : (UJJSON::getInt) no valid value in this json"));
-		return -1;
-	}
-	UE_LOG(LogTemp, Error, TEXT("ERROR : (UJJSON::getInt) no valid json object to extract integer"));
+// 	if (Container.Value.IsValid())
+// 	{
+// 		bool output;
+// 		if (Container.Value->TryGetBool(output))
+// 		{
+// 			return output;
+// 		}
+// 		UE_LOG(LogTemp, Error, TEXT("ERROR : (UJJSON::getString) no valid value in this json"));
+// 		return "";
+// 	}
+// 	UE_LOG(LogTemp, Error, TEXT("ERROR : (UJJSON::getString) no valid json object to extract string"));
+	return false;
+}
+
+
+
+int32 UDataObject::GetJsonInt(UPARAM(ref) FJsonData& Container)
+{
+// 	if (Container.Value.IsValid())
+// 	{
+// 		int32 output;
+// 		if (Container.Value->TryGetNumber(output))
+// 		{
+// 			return output;
+// 		}
+// 		UE_LOG(LogTemp, Error, TEXT("ERROR : (UJJSON::getInt) no valid value in this json"));
+// 		return -1;
+// 	}
+// 	UE_LOG(LogTemp, Error, TEXT("ERROR : (UJJSON::getInt) no valid json object to extract integer"));
 	return -1;
 }
 
-float UDataObject::GetFloat(UPARAM(ref) FJsonData& Container)
+float UDataObject::GetJsonFloat(UPARAM(ref) FJsonData& Container)
 {
-	if (Container.Value.IsValid())
-	{
-		double output;
-		if (Container.Value->TryGetNumber(output))
-		{
-			return (float)output;
-		}
-		UE_LOG(LogTemp, Error, TEXT("ERROR : (UJJSON::getString) no valid value in this json"));
-		return -1.f;
-	}
-	UE_LOG(LogTemp, Error, TEXT("ERROR : (UJJSON::getString) no valid json object to extract float"));
+// 	if (Container.Value.IsValid())
+// 	{
+// 		double output;
+// 		if (Container.Value->TryGetNumber(output))
+// 		{
+// 			return (float)output;
+// 		}
+// 		UE_LOG(LogTemp, Error, TEXT("ERROR : (UJJSON::getString) no valid value in this json"));
+// 		return -1.f;
+// 	}
+// 	UE_LOG(LogTemp, Error, TEXT("ERROR : (UJJSON::getString) no valid json object to extract float"));
 	return -1.f;
 }
 
-UObject* UDataObject::GetUObject(UPARAM(ref) FJsonData& Container)
-{
-	return nullptr;
-}
+
 
