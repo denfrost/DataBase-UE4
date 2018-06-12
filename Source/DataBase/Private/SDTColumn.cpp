@@ -1,6 +1,7 @@
 #include "SDTColumn.h"
 #include "Runtime/Slate/Public/Widgets/Input/SEditableTextBox.h"
 #include "Runtime/Slate/Public/Widgets/Text/STextBlock.h"
+#include "Runtime/Slate/Public/Widgets/Layout/SScaleBox.h"
 
 void SDTColumn::OnTextCommitted(const FText& InText, ETextCommit::Type CommitedType)
 {
@@ -32,9 +33,17 @@ void SDTColumn::Construct(const FArguments& InArgs)
 	if (!bIsEditable)
 	{
 		ChildSlot[
-			SAssignNew(TextBox, STextBlock)
-				.ColorAndOpacity((bIsMaster) ? DataTableStyle->HeaderStyle.TextColorAndOpacity : DataTableStyle->BodyStyle.TextColorAndOpacity)
-				.Text(Value)
+			SNew(SScaleBox)
+				.SingleLayoutPass(true)
+				.Stretch(EStretch::ScaleToFit)
+				.StretchDirection(EStretchDirection::Both)
+				.VAlign(VAlign_Fill)
+				.HAlign(HAlign_Fill)
+				[
+					SAssignNew(TextBox, STextBlock)
+					.ColorAndOpacity((bIsMaster) ? DataTableStyle->HeaderStyle.TextColorAndOpacity : DataTableStyle->BodyStyle.TextColorAndOpacity)
+					.Text(Value)
+				]
 		];
 
 		TextBox->SetFont((bIsMaster) ? DataTableStyle->HeaderStyle.Font : DataTableStyle->BodyStyle.Font);
@@ -43,6 +52,7 @@ void SDTColumn::Construct(const FArguments& InArgs)
 	else
 	{
 		ChildSlot[
+
 			SAssignNew(EditableTextBox, SEditableTextBox)
 				.Style(&FDataTableEditableTextStyle::GetDefault().EditableTextStyle)
 				.OnTextCommitted(this, &SDTColumn::OnTextCommitted)

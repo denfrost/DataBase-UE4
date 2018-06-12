@@ -72,6 +72,10 @@ void SDataTab::AddRow(TArray<FString>& Values,const bool& bUseWidgets,const bool
 	PosSlot[
 // 		SNew(SButton)
 // 			.OnClicked(this, &SDataTab::OnClick)
+// 			.ClickMethod(EButtonClickMethod::PreciseClick)
+// 			.TouchMethod(EButtonTouchMethod::PreciseTap)
+// 			.OnClicked(this, &SDataTab::OnClick)
+// 			
 
 		SAssignNew(NewRow, SDTHeaderRow)
 			.Values(Values)
@@ -86,13 +90,13 @@ void SDataTab::AddRow(TArray<FString>& Values,const bool& bUseWidgets,const bool
 	];
 	
 	check(NewRow.IsValid());
-	NewRow->UpdateWidget();
 	Rows.Add(NewRow);
+	NewRow->UpdateWidget();
 }
 
 FReply SDataTab::OnClick()
 {
-// 	UE_LOG(LogTemp)
+	UE_LOG(LogTemp, Warning, TEXT("yeah"));
 	return FReply::Handled();
 }
 

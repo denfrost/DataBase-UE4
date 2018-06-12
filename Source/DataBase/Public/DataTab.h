@@ -74,17 +74,10 @@ public:
 		TEnumAsByte<ETextJustify::Type> Justification;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data Table")
-		FSlateBrush Normal;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data Table")
-		FSlateBrush Pressed;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data Table")
-		FSlateBrush Hovered;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data Table")
 		FScrollBarStyle ScrollBarStyle;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data Table")
+		FButtonStyle RowButtonStyle;
 
 	UPROPERTY()
 		FEditableTextBoxStyle TextBoxStyle;
@@ -156,15 +149,17 @@ public:
 		BodyStyle.Font = FSlateFontInfo(RobotoFontObj, 12, FName("Bold"));
 
 		BodyStyle.Justification = ETextJustify::Left;
-		BodyStyle.Normal.TintColor = FSlateColor(FLinearColor(0, 0, 0, 1));
-		BodyStyle.Hovered.TintColor = FSlateColor(FLinearColor(.5f, .5f, .5f, .5f));
+		BodyStyle.RowButtonStyle.Normal.TintColor = FSlateColor(FLinearColor(0, 0, 0, 1));
+		BodyStyle.RowButtonStyle.Hovered.TintColor = FSlateColor(FLinearColor(.5f, .5f, .5f, .5f));
 
-		BodyStyle.TextBoxStyle.BackgroundImageNormal.TintColor = BodyStyle.Normal.TintColor;
+
+		BodyStyle.TextBoxStyle.BackgroundImageNormal.TintColor = BodyStyle.RowButtonStyle.Normal.TintColor;
 		BodyStyle.TextBoxStyle.ForegroundColor = FSlateColor(FLinearColor(1, 1, 1, 1));
-		BodyStyle.TextBoxStyle.BackgroundImageHovered.TintColor = BodyStyle.Hovered.TintColor;
+		BodyStyle.TextBoxStyle.BackgroundImageHovered.TintColor = BodyStyle.RowButtonStyle.Hovered.TintColor;
 		BodyStyle.TextBoxStyle.BackgroundImageFocused.TintColor = FSlateColor(FLinearColor(.2f, .2f, .2f, .2f));
 
 		BodyStyleColumnsOverrides = TArray<FDataTableStyleOverride>();
+	
 	}
 
 	static const FDataTableStyle& GetDefault() {

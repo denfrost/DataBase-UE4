@@ -48,19 +48,23 @@ private:
 	TArray<int32> ColumnIDs;
 
 	void OnColumnChanged(const int32& ColumnIndex, const FString& Value);
+	FReply OnRowBtnClicked();
 
-	float Tempo = 0;
-	bool bPressed = false;
+	int32 getLargestValueTextSize();
+	FString ProcessTextSize(const FString& InText, const int32& Size);
+
 public:
 	
 	//BEGIN SWidget
 	/*virtual FReply OnMouseButtonDoubleClick(const FGeometry& InMyGeometry, const FPointerEvent& InMouseEvent) override;*/ //Double click only works on desktop
-	virtual FReply OnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
-	virtual FReply OnMouseButtonUp(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
-	virtual void OnMouseEnter(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
-	virtual void OnMouseLeave(const FPointerEvent& MouseEvent) override;
-	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime);
+// 	virtual FReply OnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
+// 	virtual FReply OnMouseButtonUp(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
+// 	virtual void OnMouseEnter(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
+// 	virtual void OnMouseLeave(const FPointerEvent& MouseEvent) override;
+// 	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime);
 	//END SWidget
+
+
 
 
 	bool CheckCriteria(const FDTCriteria& InCriteria);
