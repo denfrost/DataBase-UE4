@@ -49,16 +49,21 @@ private:
 
 	void OnColumnChanged(const int32& ColumnIndex, const FString& Value);
 
+	float Tempo = 0;
+	bool bPressed = false;
 public:
 	
 	//BEGIN SWidget
-	virtual FReply OnMouseButtonDoubleClick(const FGeometry& InMyGeometry, const FPointerEvent& InMouseEvent) override;
+	/*virtual FReply OnMouseButtonDoubleClick(const FGeometry& InMyGeometry, const FPointerEvent& InMouseEvent) override;*/ //Double click only works on desktop
 	virtual FReply OnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
 	virtual FReply OnMouseButtonUp(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
 	virtual void OnMouseEnter(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
 	virtual void OnMouseLeave(const FPointerEvent& MouseEvent) override;
+	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime);
 	//END SWidget
 
+
+	bool CheckCriteria(const FDTCriteria& InCriteria);
 	void SetColumns(const TArray<FDataTableFieldDescription>& InFields, const TArray<FString>& InValues);
 	void UpdateWidget();
 	void ClearColumns();

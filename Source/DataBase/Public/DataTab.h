@@ -196,6 +196,35 @@ public:
 	};
 };
 
+USTRUCT(BlueprintType)
+struct FDTCriteria
+{
+	GENERATED_BODY()
+
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DataTable")
+		int32 ColumnIndex;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DataTable")
+		TArray<FString> Criterias;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DataTable")
+		bool bIsNumeric;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DataTable")
+		FVector2D NumericThreshold;
+
+
+	FDTCriteria()
+	{
+		ColumnIndex = 0;
+		Criterias.Empty();
+		bIsNumeric = false;
+		NumericThreshold = FVector2D::ZeroVector;
+	}
+};
+
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDataTableRowClicked, int32, Index, TArray<FString>, Values);
 
@@ -236,6 +265,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Data Table")
 		void SetRowStyleOverride(int32 Index, const FDataTableStyleOverride& InStyle);
+
+	UFUNCTION(BlueprintCallable, Category = "Data Table", meta = (ToolTip = "Hide and unhide rows based on some criterias"))
+		void AddSearchCriteria(const TArray<FDTCriteria>& NewCriteria);
+
+	UFUNCTION(BlueprintCallable, Category = "Data Table", meta = (ToolTip = "Clear the criteria will display all info for each row"))
+		void ClearSearchCriteria();
 
 
 protected:

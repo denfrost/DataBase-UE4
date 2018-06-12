@@ -160,7 +160,18 @@ public:
 		static FJsonData GetJsonObject(UPARAM(ref)FJsonData& Container, const FString& Field);
 
 
+	UFUNCTION(BlueprintPure, Category = "JSON")
+		static	FJsonData constructJsonFromString(const FString& jsonAsString )
+		{
 
+			TSharedRef< TJsonReader<> > JsonReader = TJsonReaderFactory<>::Create(jsonAsString);
+			FJsonData Json;
+			if (FJsonSerializer::Deserialize(JsonReader, Json.Json) && Json.Json.IsValid())
+			{
+				return Json;
+			}
+			return FJsonData::GetDefault();
+		}
 
 
 

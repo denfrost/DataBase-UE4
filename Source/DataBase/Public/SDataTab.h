@@ -61,13 +61,24 @@ private:
 	void OnRowClicked(const int32& RowIndex, const TArray<FString>& Values);
 	void OnRowDoubleClicked(const int32& RowIndex, const TArray<FString>& Values);
 
+	FReply OnClick();
+
+	//SearchCriteria
+	bool bIsSearching;
+
 public:
+	//~~SWidget
+	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime) override;
+	//~~
+
 	//DataTab
 	virtual void UpdateWidget();
 	void SetFields(const TArray<FDataTableFieldDescription>& InFields);
 	void AddRow(TArray<FString>& Values,const bool& bUseWidgets,const bool& IsEditable);
 
 	void SetRowStyleOverride(const int32& Index, const FDataTableStyleOverride& InStyle);
+	void AddSearchCriteria(const TArray<FDTCriteria>& NewCriteria);
+	void ClearCriteria();
 
 	void Construct(const FArguments& InArgs);
 	~SDataTab();

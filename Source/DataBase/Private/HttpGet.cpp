@@ -57,7 +57,14 @@ void UHttpGET::HandleRequest(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpR
 		return;
 	}
 
-	UE_LOG(LogTemp, Error, TEXT("Request Code Error: %i"), HttpResponse->GetResponseCode());
-	OnFail.Broadcast(FJsonData::GetDefault(), HttpResponse->GetContentAsString());
+	if (HttpResponse.IsValid())
+	{
+		UE_LOG(LogTemp, Error, TEXT("Request Code Error: %i"), HttpResponse->GetResponseCode());
+		OnFail.Broadcast(FJsonData::GetDefault(), HttpResponse->GetContentAsString());
+		return;
+	}
+
+	UE_LOG(LogTemp, Error, TEXT(" UHttpGET::HandleRequest Request was null wtf is happing!!!! should never reach this"));
+	OnFail.Broadcast(FJsonData::GetDefault(),"SOMETHING GOES MEGA WRONG!!");
 }
 

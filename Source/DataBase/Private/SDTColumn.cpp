@@ -51,6 +51,11 @@ void SDTColumn::Construct(const FArguments& InArgs)
 	}	
 }
 
+FString SDTColumn::GetValueAsString()
+{
+	return Value.ToString();
+}
+
 SDTColumn::~SDTColumn()
 {
 

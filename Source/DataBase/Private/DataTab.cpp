@@ -48,6 +48,22 @@ void UDataTab::SetRowStyleOverride(int32 Index, const FDataTableStyleOverride& I
 	}
 }
 
+void UDataTab::AddSearchCriteria(const TArray<FDTCriteria>& NewCriteria)
+{
+	if (DataTable.IsValid())
+	{
+		DataTable->AddSearchCriteria(NewCriteria);
+	}
+}
+
+void UDataTab::ClearSearchCriteria()
+{
+	if (DataTable.IsValid())
+	{
+		DataTable->ClearCriteria();
+	}
+}
+
 TSharedRef<SWidget> UDataTab::RebuildWidget()
 {
 	if (DataObject && !DataObject->IsPendingKill())

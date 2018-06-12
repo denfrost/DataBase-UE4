@@ -3,21 +3,41 @@
 #include "Widgets/Layout/SSplitter.h"
 #include "SDTColumn.h"
 
-FReply SDTHeaderRow::OnMouseButtonDoubleClick(const FGeometry& InMyGeometry, const FPointerEvent& InMouseEvent)
-{
-	if (bIsEditable) return  FReply::Handled();
+// FReply SDTHeaderRow::OnMouseButtonDoubleClick(const FGeometry& InMyGeometry, const FPointerEvent& InMouseEvent)
+// {
+// 	if (bIsEditable) return  FReply::Handled();
+// 
+// 	if (IsEnabled() && (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton || InMouseEvent.IsTouchEvent()))
+// 	{
+// 		if (!bIsMaster)
+// 		{
+// 			BackgroundBorder->SetBorderImage(&DataTableStyle->BodyStyle.Pressed);
+// 		}
+// 		OnRowDoubleClicked.ExecuteIfBound(RowIndex, Values);
+// 		return FReply::Handled();
+// 	}
+// 	return FReply::Unhandled();
+// }
 
-	if (IsEnabled() && (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton || InMouseEvent.IsTouchEvent()))
+void SDTHeaderRow::Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime)
+{
+	
+	if (bPressed)
 	{
-		if (!bIsMaster)
-		{
-			BackgroundBorder->SetBorderImage(&DataTableStyle->BodyStyle.Pressed);
-		}
-		OnRowDoubleClicked.ExecuteIfBound(RowIndex, Values);
-		return FReply::Handled();
+		Tempo += InDeltaTime;
+		
 	}
-	return FReply::Unhandled();
+	else
+	{
+		if (Tempo > 0 && Tempo < .4f)
+		{
+			Tempo = 0;
+			OnRowClicked.ExecuteIfBound(RowIndex, Values);
+		}
+	}
+	
 }
+
 
 FReply SDTHeaderRow::OnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
@@ -25,22 +45,26 @@ FReply SDTHeaderRow::OnMouseButtonDown(const FGeometry& MyGeometry, const FPoint
 
 	if (IsEnabled() && (MouseEvent.GetEffectingButton() == EKeys::LeftMouseButton || MouseEvent.IsTouchEvent()))
 	{
+		Tempo = 0;
+		bPressed = true;
 		if (!bIsMaster)
 		{
 			BackgroundBorder->SetBorderImage(&DataTableStyle->BodyStyle.Pressed);
 		}
-		OnRowClicked.ExecuteIfBound(RowIndex, Values);
-		return FReply::Handled();
+		Invalidate(EInvalidateWidget::Layout);
+		return FReply::Handled().CaptureMouse(AsShared());
 	}
-	return FReply::Unhandled();
+	return FReply::Handled();
 }
 
 FReply SDTHeaderRow::OnMouseButtonUp(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
 	if (bIsEditable) return  FReply::Handled();
 
+	
 	if (IsEnabled() && (MouseEvent.GetEffectingButton() == EKeys::LeftMouseButton || MouseEvent.IsTouchEvent()))
 	{
+		bPressed = false;
 		if (!bIsMaster)
 		{
 			FVector2D Pos = MyGeometry.AbsoluteToLocal(MouseEvent.GetScreenSpacePosition());
@@ -56,7 +80,7 @@ FReply SDTHeaderRow::OnMouseButtonUp(const FGeometry& MyGeometry, const FPointer
 		}
 		return FReply::Handled();
 	}
-	return FReply::Unhandled();
+	return FReply::Handled();
 }
 
 void SDTHeaderRow::OnMouseEnter(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
@@ -77,6 +101,22 @@ void SDTHeaderRow::OnMouseLeave(const FPointerEvent& MouseEvent)
 	{
 		BackgroundBorder->SetBorderImage(&DataTableStyle->BodyStyle.Normal);
 	}
+}
+
+
+bool SDTHeaderRow::CheckCriteria(const FDTCriteria& InCriteria)
+{
+	if (Columns.IsValidIndex(InCriteria.ColumnIndex))
+	{
+		for (auto& Crit : InCriteria.Criterias)
+		{
+			if (Columns[InCriteria.ColumnIndex]->GetValueAsString().Contains(Crit))
+			{
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 void SDTHeaderRow::SetColumns(const TArray<FDataTableFieldDescription>& InFields, const TArray<FString>& InValues)
@@ -158,7 +198,7 @@ void SDTHeaderRow::OnColumnChanged(const int32& ColumnIndex, const FString& Valu
 	if (OnDTRowChanged.IsBound())
 	{
 		OnDTRowChanged.ExecuteIfBound(RowIndex, ColumnIndex, Value);
-		UE_LOG(LogTemp, Log, TEXT("Row"));;
+		
 	}
 }
 

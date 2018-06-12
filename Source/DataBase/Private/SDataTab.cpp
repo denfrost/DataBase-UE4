@@ -2,6 +2,7 @@
 #include "SDTHeaderRow.h"
 #include "Runtime/SlateCore/Public/Widgets/SBoxPanel.h"
 #include "Runtime/Slate/Public/Widgets/Layout/SScrollBox.h"
+#include "DTFunctionLibrary.h"
 
 void SDataTab::OnRowChanged(const int32& RowIndex, const int32& ColumnIndex, const FString& Value)
 {
@@ -16,6 +17,12 @@ void SDataTab::OnRowClicked(const int32& RowIndex, const TArray<FString>& Values
 void SDataTab::OnRowDoubleClicked(const int32& RowIndex, const TArray<FString>& Values)
 {
 	OnRowDoubleClick.ExecuteIfBound(RowIndex, Values);
+}
+
+
+void SDataTab::Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime)
+{
+	//later with can implemented the criteria here, for now is going to be in one single frame
 }
 
 void SDataTab::UpdateWidget()
@@ -63,6 +70,9 @@ void SDataTab::AddRow(TArray<FString>& Values,const bool& bUseWidgets,const bool
 	TSharedPtr<SDTHeaderRow> NewRow;
 	SScrollBox::FSlot& PosSlot = RowContainer->AddSlot().Padding(DataTableStyle->BodyStyle.GeneralMargin);
 	PosSlot[
+// 		SNew(SButton)
+// 			.OnClicked(this, &SDataTab::OnClick)
+
 		SAssignNew(NewRow, SDTHeaderRow)
 			.Values(Values)
 			.DataTableStyle(DataTableStyle)
@@ -80,6 +90,13 @@ void SDataTab::AddRow(TArray<FString>& Values,const bool& bUseWidgets,const bool
 	Rows.Add(NewRow);
 }
 
+FReply SDataTab::OnClick()
+{
+// 	UE_LOG(LogTemp)
+	return FReply::Handled();
+}
+
+
 void SDataTab::SetRowStyleOverride(const int32& Index, const FDataTableStyleOverride& InStyle)
 {
 	if (Rows.IsValidIndex(Index))
@@ -88,6 +105,34 @@ void SDataTab::SetRowStyleOverride(const int32& Index, const FDataTableStyleOver
 		return;
 	}
 	UE_LOG(LogTemp, Warning, TEXT("SDataTab::SetRowStyleOverride  Invalid Row Index"));
+}
+
+void SDataTab::AddSearchCriteria(const TArray<FDTCriteria>& NewCriteria)
+{
+	bIsSearching = true;
+	/*UE_LOG(LogTemp, Warning, TEXT("new criteria received column %i Criteria %s"), ColumnIndex, *Criteria);*/
+	//one single frame criteria
+
+	for (int32 i = 0; i < CurrentDataObject->Data.Num(); i++)
+	{
+		if (UDTFunctionLibrary::IsValidCriteria(CurrentDataObject->Data[i].Inputs, NewCriteria))
+		{
+			Rows[i]->SetVisibility(EVisibility::Collapsed);
+		}
+		else
+		{
+			Rows[i]->SetVisibility(EVisibility::Visible);
+		}
+	}
+}
+
+void SDataTab::ClearCriteria()
+{
+	bIsSearching = false;
+	for (auto& row : Rows)
+	{
+		row->SetVisibility(EVisibility::Visible);
+	}
 }
 
 void SDataTab::Construct(const FArguments& InArgs)
@@ -99,6 +144,8 @@ void SDataTab::Construct(const FArguments& InArgs)
 	Fields = InArgs._ColumnDescriptions;
 	OnRowClick = InArgs._OnRowClicked;
 	OnRowDoubleClick = InArgs._OnRowDoubleClicked;
+
+	bIsSearching = false;
 
 	ChildSlot[
 		SNew(SVerticalBox)

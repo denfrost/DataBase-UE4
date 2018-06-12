@@ -40,5 +40,7 @@ private:
 public:
 	void SetFontAndColor(const FDataTableStyleOverride& InDTStyleOverride);
 	void Construct(const FArguments& InArgs);
+
+	FString GetValueAsString();
 	~SDTColumn();
 };

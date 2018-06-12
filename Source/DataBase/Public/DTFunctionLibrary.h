@@ -2,6 +2,7 @@
 #include "EngineMinimal.h"
 #include "CoreMinimal.h"
 #include "DataObject.h"
+#include "DataTab.h"
 #include "DTFunctionLibrary.generated.h"
 
 
@@ -12,6 +13,9 @@ class DATABASE_API UDTFunctionLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
+
+	UFUNCTION(BlueprintCallable, Category = "Data Table")
+		static bool IsValidCriteria(const TArray<FString>& Values, const TArray<FDTCriteria>& NewCriteria);
 
 	UFUNCTION(BlueprintCallable, CustomThunk, Category = "Data Table", meta = (WorldContext = "WorldContextObject", CustomStructureParam = "OutRow"))//*, BlueprintInternalUseOnly = "true"*/))
 		static void GetRowAsStruct(UObject* WorldContextObject, UDataObject* InDT, FRowData InRow, UScriptStruct* OutRow);
