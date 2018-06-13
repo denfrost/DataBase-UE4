@@ -134,9 +134,9 @@ void SDTHeaderRow::UpdateWidget()
 			Values.Add("");
 		}
 
-		SHorizontalBox::FSlot& PosSlot = MainContainer->AddSlot().Padding((bIsMaster) ? DataTableStyle->HeaderStyle.Margin : DataTableStyle->BodyStyle.GeneralMargin);
+		SHorizontalBox::FSlot& PosSlot = MainContainer->AddSlot().HAlign(HAlign_Fill).VAlign(VAlign_Fill).Padding((bIsMaster) ? DataTableStyle->HeaderStyle.Margin : DataTableStyle->BodyStyle.GeneralMargin);
 
-		
+
 		FString FormattedText;
 		if (bIsMaster)
 		{
@@ -148,18 +148,31 @@ void SDTHeaderRow::UpdateWidget()
 		}
 
 		TSharedPtr<SDTColumn> Col;
+
 		PosSlot[
-			SAssignNew(Col,SDTColumn)
-				.Value(FText::FromString(FormattedText))
-				.DataTableStyle(DataTableStyle)
-				.Editable(bIsEditable)
-				.ColumnIndex(i)
-				.OnColumnChanged(this, &SDTHeaderRow::OnColumnChanged)
-				.bIsMaster(bIsMaster)
+			SNew(SScaleBox)
+				.SingleLayoutPass(true)
+				.Stretch(EStretch::ScaleToFit)
+				.StretchDirection(EStretchDirection::Both)
+				.VAlign(VAlign_Center)
+				.HAlign(HAlign_Fill)
+				[
+
+// 					SNew(STextBlock).Text(FText::FromString(FormattedText))
+// 					.ColorAndOpacity((bIsMaster) ? DataTableStyle->HeaderStyle.TextColorAndOpacity : DataTableStyle->BodyStyle.TextColorAndOpacity)
+					SAssignNew(Col, SDTColumn)
+					.Value(FText::FromString(FormattedText))
+					.DataTableStyle(DataTableStyle)
+					.Editable(bIsEditable)
+					.ColumnIndex(i)
+					.OnColumnChanged(this, &SDTHeaderRow::OnColumnChanged)
+					.bIsMaster(bIsMaster)
+				]
+			
 		];
 
-		ColumnIDs.Add(i);
-		Columns.Add(Col);
+// 		ColumnIDs.Add(i);
+// 		Columns.Add(Col);
 	}
 
 	if (bIsMaster)
@@ -235,9 +248,10 @@ int32 SDTHeaderRow::getLargestValueTextSize()
 FString SDTHeaderRow::ProcessTextSize(const FString& InText, const int32& Size)
 {
 	FString out = InText;
-	while (out.Len() < Size)
+	FString add = " ";
+	while (out.Len() < Size * 3)
 	{
-		out += " ";
+		out = out  + " ";
 	}
 	return out;
 }

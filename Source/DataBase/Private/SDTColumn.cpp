@@ -30,23 +30,16 @@ void SDTColumn::Construct(const FArguments& InArgs)
 	ColumnIndex = InArgs._ColumnIndex;
 	bIsMaster = InArgs._bIsMaster;
 
+
 	if (!bIsEditable)
 	{
 		ChildSlot[
-			SNew(SScaleBox)
-				.SingleLayoutPass(true)
-				.Stretch(EStretch::ScaleToFit)
-				.StretchDirection(EStretchDirection::Both)
-				.VAlign(VAlign_Fill)
-				.HAlign(HAlign_Fill)
-				[
-					SAssignNew(TextBox, STextBlock)
-					.ColorAndOpacity((bIsMaster) ? DataTableStyle->HeaderStyle.TextColorAndOpacity : DataTableStyle->BodyStyle.TextColorAndOpacity)
-					.Text(Value)
-				]
+			SAssignNew(TextBox, STextBlock).Text(Value)
+				.Font((bIsMaster) ? DataTableStyle->HeaderStyle.Font : DataTableStyle->BodyStyle.Font)
+				.ColorAndOpacity((bIsMaster) ? DataTableStyle->HeaderStyle.TextColorAndOpacity : DataTableStyle->BodyStyle.TextColorAndOpacity)
 		];
 
-		TextBox->SetFont((bIsMaster) ? DataTableStyle->HeaderStyle.Font : DataTableStyle->BodyStyle.Font);
+		
 		TextBox->SetJustification((bIsMaster) ? DataTableStyle->HeaderStyle.Justification : DataTableStyle->BodyStyle.Justification);
 	}
 	else
