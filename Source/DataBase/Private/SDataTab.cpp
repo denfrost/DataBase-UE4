@@ -34,7 +34,7 @@ void SDataTab::UpdateWidget()
 		RowContainer->ClearChildren();
 		for (int32 i = 0; i < CurrentDataObject->Data.Num(); i++)
 		{
-			AddRow(CurrentDataObject->Data[i].Inputs, CurrentDataObject->bUseCustomWidgets, bIsEditable);
+			AddRow(CurrentDataObject->Data[i].Inputs, bIsEditable);
 		}
 	}
 }
@@ -53,7 +53,7 @@ void SDataTab::SetFields(const TArray<FDataTableFieldDescription>& InFields)
 	UpdateWidget();
 }
 
-void SDataTab::AddRow(TArray<FString>& Values,const bool& bUseWidgets,const bool& IsEditable)
+void SDataTab::AddRow(TArray<FString>& Values, const bool& IsEditable)
 {
 	check(RowContainer.IsValid());
 
@@ -70,12 +70,6 @@ void SDataTab::AddRow(TArray<FString>& Values,const bool& bUseWidgets,const bool
 	TSharedPtr<SDTHeaderRow> NewRow;
 	SScrollBox::FSlot& PosSlot = RowContainer->AddSlot().Padding(DataTableStyle->BodyStyle.GeneralMargin);
 	PosSlot[
-// 		SNew(SButton)
-// 			.OnClicked(this, &SDataTab::OnClick)
-// 			.ClickMethod(EButtonClickMethod::PreciseClick)
-// 			.TouchMethod(EButtonTouchMethod::PreciseTap)
-// 			.OnClicked(this, &SDataTab::OnClick)
-// 			
 
 		SAssignNew(NewRow, SDTHeaderRow)
 			.Values(Values)

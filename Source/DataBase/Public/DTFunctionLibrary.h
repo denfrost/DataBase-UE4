@@ -15,6 +15,12 @@ class DATABASE_API UDTFunctionLibrary : public UBlueprintFunctionLibrary
 public:
 
 	UFUNCTION(BlueprintCallable, Category = "Data Table")
+		static bool LoadCSV(UDataObject* DataToFill, const FString& InFile, bool bSkipFirstLine = true, bool bCastOnUpdate = false);
+
+	UFUNCTION(BlueprintCallable, Category = "Data Table")
+		static bool ExportCSV(UDataObject* DataObject, const FString& ResultFile);
+
+	UFUNCTION(BlueprintCallable, Category = "Data Table")
 		static bool IsValidCriteria(const TArray<FString>& Values, const TArray<FDTCriteria>& NewCriteria);
 
 	UFUNCTION(BlueprintCallable, CustomThunk, Category = "Data Table", meta = (WorldContext = "WorldContextObject", CustomStructureParam = "OutRow"))//*, BlueprintInternalUseOnly = "true"*/))

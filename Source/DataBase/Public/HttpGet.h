@@ -4,6 +4,7 @@
 #include "Interfaces/IHttpRequest.h"
 #include "Kismet/BlueprintAsyncActionBase.h"
 #include "DataObject.h"
+#include "JsonFunctionLibrary.h"
 #include "HttpGet.generated.h"
 
 

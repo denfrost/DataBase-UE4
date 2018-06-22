@@ -74,7 +74,7 @@ public:
 	//DataTab
 	virtual void UpdateWidget();
 	void SetFields(const TArray<FDataTableFieldDescription>& InFields);
-	void AddRow(TArray<FString>& Values,const bool& bUseWidgets,const bool& IsEditable);
+	void AddRow(TArray<FString>& Values,const bool& IsEditable);
 
 	void SetRowStyleOverride(const int32& Index, const FDataTableStyleOverride& InStyle);
 	void AddSearchCriteria(const TArray<FDTCriteria>& NewCriteria);

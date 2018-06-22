@@ -7,7 +7,11 @@
 #include "Editor/EditorStyle/Public/EditorStyleSet.h"
 #include "Editor/PropertyEditor/Public/IDetailsView.h"
 #include "Editor/PropertyEditor/Public/PropertyEditorModule.h"
+#include "Developer/DesktopPlatform/Public/IDesktopPlatform.h"
+#include "Developer/DesktopPlatform/Public/DesktopPlatformModule.h"
 #include "SDataTab.h"
+#include "DTFunctionLibrary.h"
+#include "DataObjectEditor_Style.h"
 
 namespace EditableDataObjectToolKit
 {
@@ -203,19 +207,77 @@ void FDataObjectEditor::FillToolbar(FToolBarBuilder& ToolbarBuilder, const TShar
 	{
 		//Import from CSV file
 		FUIAction ImportCSV(FExecuteAction::CreateSP(this, &FDataObjectEditor::ImportFromCSV));
-		ToolbarBuilder.AddToolBarButton(ImportCSV, TEXT("Import from CSV"), FText::FromString("FromCSV"), FText::FromString("Import data directly from a csv table"));
+		ToolbarBuilder.AddToolBarButton(ImportCSV, TEXT("Import from CSV"), FText::FromString("FromCSV"), FText::FromString("Import data directly from a csv table"), FSlateIcon(FDataObjectEditorStyle::GetStyleSetName(),"csv.down"));
 
 		//Add New row
+		FUIAction ExportCSVCmd(FExecuteAction::CreateSP(this, &FDataObjectEditor::ExportCSV));
+		ToolbarBuilder.AddToolBarButton(ExportCSVCmd, TEXT("Add Row"), FText::FromString("ToCSV"), FText::FromString("Export your data object as csv file"), FSlateIcon(FDataObjectEditorStyle::GetStyleSetName(), "csv.up"));
+		
+	}
+	ToolbarBuilder.EndSection();
+
+	ToolbarBuilder.BeginSection("Data Manipulation");
+	{
+		//Add New row
 		FUIAction AddNewRow(FExecuteAction::CreateSP(this, &FDataObjectEditor::AddNewRow));
-		ToolbarBuilder.AddToolBarButton(AddNewRow, TEXT("Add Row"), FText::FromString("Add Row"), FText::FromString("Add A new row to your table"));
+		ToolbarBuilder.AddToolBarButton(AddNewRow, TEXT("Add Row"), FText::FromString("Add Row"), FText::FromString("Add A new row to your table"), FSlateIcon(FDataObjectEditorStyle::GetStyleSetName(), "dt.addrow"));
 	}
 	ToolbarBuilder.EndSection();
 }
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
+void FDataObjectEditor::ExportCSV()
+{
+	ensure(DataObject && DataTableView.IsValid() && DataObjectDetailsView.IsValid());
+	IDesktopPlatform* DesktopPlatform = FDesktopPlatformModule::Get();
+
+	if (DesktopPlatform)
+	{
+		TSharedPtr<SWindow> ParentWindow = FSlateApplication::Get().FindWidgetWindow(DataTableView->AsShared());
+		
+		if (!ParentWindow.IsValid()) return;
+
+		TArray<FString> OutFile;
+		if (DesktopPlatform->SaveFileDialog(ParentWindow->GetNativeWindow()->GetOSWindowHandle(), "Export data object as csv", FPaths::ProjectSavedDir(), "", "CSV document|*.csv", EFileDialogFlags::None, OutFile))
+		{
+			if (!OutFile.IsValidIndex(0)) return;
+
+			OutFile[0] = (OutFile[0].Contains(".csv")) ? OutFile[0] : OutFile[0] + ".csv";
+			if (UDTFunctionLibrary::ExportCSV(DataObject, OutFile[0]))
+			{
+				UE_LOG(LogTemp, Log, TEXT("data object exported sucess: %s"), *DataObject->CSVPath.FilePath);
+			}
+		}
+	}
+}
+
+
 void FDataObjectEditor::ImportFromCSV()
 {
-	UE_LOG(LogTemp, Log, TEXT("yeah"));
+	ensure(DataObject && DataTableView.IsValid());
+	IDesktopPlatform* DesktopPlatform = FDesktopPlatformModule::Get();
+
+	if (DesktopPlatform)
+	{
+		TSharedPtr<SWindow> ParentWindow = FSlateApplication::Get().FindWidgetWindow(DataTableView->AsShared());
+		FString OutFolderName;
+
+		if (!ParentWindow.IsValid()) return;
+
+		TArray<FString> OutFile;
+		if (DesktopPlatform->OpenFileDialog(ParentWindow->GetNativeWindow()->GetOSWindowHandle(), "Choose csv file", FPaths::ProjectDir(), "", "CSV document|*.csv", EFileDialogFlags::None, OutFile))
+		{
+			if (!OutFile.IsValidIndex(0)) return;
+			
+			if (UDTFunctionLibrary::LoadCSV( DataObject, OutFile[0]))
+			{
+				UE_LOG(LogTemp, Log, TEXT("csv file open and data table populated: %s"), *OutFile[0]);
+				DataObject->CSVPath.FilePath = OutFile[0];
+				DataObject->MarkPackageDirty();
+				DataTableView->UpdateWidget();
+			}
+		}
+	}
 }
 
 
@@ -224,7 +286,7 @@ void FDataObjectEditor::AddNewRow()
 	ensure(DataObject && DataTableView.IsValid());
 	TArray<FString> RowEmptyValues;
 	RowEmptyValues.Init("", DataObject->Fields.Num());
-	DataTableView->AddRow(RowEmptyValues, DataObject->bUseCustomWidgets,true);
+	DataTableView->AddRow(RowEmptyValues, true);
 
 	//Add new empty Data to Our Object
 	FRowData NewDataRow;

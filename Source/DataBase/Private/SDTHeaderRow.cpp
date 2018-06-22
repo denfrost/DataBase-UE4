@@ -4,91 +4,6 @@
 #include "SDTColumn.h"
 #include "Runtime/Slate/Public/Widgets/Layout/SScaleBox.h"
 
-// void SDTHeaderRow::Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime)
-// {
-// 	
-// 	if (bPressed)
-// 	{
-// 		Tempo += InDeltaTime;
-// 		
-// 	}
-// 	else
-// 	{
-// 		if (Tempo > 0 && Tempo < .4f)
-// 		{
-// 			Tempo = 0;
-// 			OnRowClicked.ExecuteIfBound(RowIndex, Values);
-// 		}
-// 	}
-// 	
-// }
-// 
-// 
-// FReply SDTHeaderRow::OnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
-// {
-// 	if (bIsEditable) return  FReply::Handled();
-// 
-// 	if (IsEnabled() && (MouseEvent.GetEffectingButton() == EKeys::LeftMouseButton || MouseEvent.IsTouchEvent()))
-// 	{
-// 		Tempo = 0;
-// 		bPressed = true;
-// 		if (!bIsMaster)
-// 		{
-// 			BackgroundBorder->SetBorderImage(&DataTableStyle->BodyStyle.Pressed);
-// 		}
-// 		Invalidate(EInvalidateWidget::Layout);
-// 		return FReply::Handled().CaptureMouse(AsShared());
-// 	}
-// 	return FReply::Handled();
-// }
-// 
-// FReply SDTHeaderRow::OnMouseButtonUp(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
-// {
-// 	if (bIsEditable) return  FReply::Handled();
-// 
-// 	
-// 	if (IsEnabled() && (MouseEvent.GetEffectingButton() == EKeys::LeftMouseButton || MouseEvent.IsTouchEvent()))
-// 	{
-// 		bPressed = false;
-// 		if (!bIsMaster)
-// 		{
-// 			FVector2D Pos = MyGeometry.AbsoluteToLocal(MouseEvent.GetScreenSpacePosition());
-// 			if (Pos.X > 0 && Pos.Y > 0)
-// 			{
-// 				BackgroundBorder->SetBorderImage(&DataTableStyle->BodyStyle.Hovered);
-// 			}
-// 			else
-// 			{
-// 				BackgroundBorder->SetBorderImage(&DataTableStyle->BodyStyle.Normal);
-// 			}
-// 			
-// 		}
-// 		return FReply::Handled();
-// 	}
-// 	return FReply::Handled();
-// }
-
-// void SDTHeaderRow::OnMouseEnter(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
-// {
-// 	if (bIsEditable) return;
-// 
-// 	if (!bIsMaster && !bIsEditable)
-// 	{
-// 		BackgroundBorder->SetBorderImage(&DataTableStyle->BodyStyle.Hovered);
-// 	}
-// }
-// 
-// void SDTHeaderRow::OnMouseLeave(const FPointerEvent& MouseEvent)
-// {
-// 	if (bIsEditable) return;
-// 
-// 	if (!bIsMaster && !bIsEditable)
-// 	{
-// 		BackgroundBorder->SetBorderImage(&DataTableStyle->BodyStyle.Normal);
-// 	}
-// }
-// 
-
 bool SDTHeaderRow::CheckCriteria(const FDTCriteria& InCriteria)
 {
 	if (Columns.IsValidIndex(InCriteria.ColumnIndex))
@@ -137,18 +52,8 @@ void SDTHeaderRow::UpdateWidget()
 		SHorizontalBox::FSlot& PosSlot = MainContainer->AddSlot().HAlign(HAlign_Fill).VAlign(VAlign_Fill).Padding((bIsMaster) ? DataTableStyle->HeaderStyle.Margin : DataTableStyle->BodyStyle.GeneralMargin);
 
 
-		FString FormattedText;
-		if (bIsMaster)
-		{
-			FormattedText = ProcessTextSize(Fields[i].FieldName.ToString(), maxTextSize);
-		}
-		else
-		{
-			FormattedText = ProcessTextSize(Values[i], maxTextSize);
-		}
-
+		FString FormattedText = (bIsMaster) ? Fields[i].FieldName.ToString() : Values[i];
 		TSharedPtr<SDTColumn> Col;
-
 		PosSlot[
 			SNew(SScaleBox)
 				.SingleLayoutPass(true)
@@ -157,9 +62,6 @@ void SDTHeaderRow::UpdateWidget()
 				.VAlign(VAlign_Center)
 				.HAlign(HAlign_Fill)
 				[
-
-// 					SNew(STextBlock).Text(FText::FromString(FormattedText))
-// 					.ColorAndOpacity((bIsMaster) ? DataTableStyle->HeaderStyle.TextColorAndOpacity : DataTableStyle->BodyStyle.TextColorAndOpacity)
 					SAssignNew(Col, SDTColumn)
 					.Value(FText::FromString(FormattedText))
 					.DataTableStyle(DataTableStyle)
@@ -171,22 +73,18 @@ void SDTHeaderRow::UpdateWidget()
 			
 		];
 
-// 		ColumnIDs.Add(i);
-// 		Columns.Add(Col);
+		ColumnIDs.Add(i);
+		Columns.Add(Col);
 	}
 
-	if (bIsMaster)
-	{
-		/*BackgroundBorder->SetBorderImage(&DataTableStyle->HeaderStyle.HeaderBrush);*/
-	}
-	else
+	if (!bIsMaster)
 	{
 		for (int32 i = 0; i < DataTableStyle->BodyStyleColumnsOverrides.Num(); i++)
 		{
 			OverrideColumnStyle(DataTableStyle->BodyStyleColumnsOverrides[i]);
 		}
 	}
-	
+
 }
 
 void SDTHeaderRow::ClearColumns()

@@ -93,6 +93,7 @@ private:
 private:
 	void FillToolbar(FToolBarBuilder& ToolbarBuilder, const TSharedRef<FUICommandList> ToolkitCommands);
 
+	void ExportCSV();
 	void ImportFromCSV();
 	void AddNewRow();
 

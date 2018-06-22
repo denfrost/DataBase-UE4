@@ -6,6 +6,8 @@
 #include "Developer/AssetTools/Public/AssetToolsModule.h"
 #include "AssetTypeActions_DataBase.h"
 #include "Runtime/SlateCore/Public/Styling/SlateStyleRegistry.h"
+#include "DataObjectEditor_Style.h"
+
 #define LOCTEXT_NAMESPACE "FDataBaseEditorModule"
 
 void FDataBaseEditorModule::StartupModule()
@@ -15,12 +17,20 @@ void FDataBaseEditorModule::StartupModule()
 	IAssetTools& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
 	TSharedPtr<FAssetTypeActions_DataObject> AssetTypeActionsDataObject = MakeShareable(new FAssetTypeActions_DataObject());
 	AssetTools.RegisterAssetTypeActions(AssetTypeActionsDataObject.ToSharedRef());
+
+
+	//register styles
+	FSlateStyleRegistry::UnRegisterSlateStyle(FDataObjectEditorStyle::GetStyleSetName());
+	FDataObjectEditorStyle::Initialize();
 }
 
 void FDataBaseEditorModule::ShutdownModule()
 {
 	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
 	// we call this function before unloading the module.
+
+	//unregister styles
+	FDataObjectEditorStyle::Shutdown();
 }
 
 #undef LOCTEXT_NAMESPACE
