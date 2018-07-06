@@ -128,11 +128,21 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data Table")
 		TArray<FDataTableStyleOverride> BodyStyleColumnsOverrides;
 
+
+	//Editor
+	FSpinBoxStyle SpinBoxStyle;
+	
+
 	FDataTableStyle()
 	{
 // 		static ConstructorHelpers::FObjectFinder<UFont> RobotoFontObj(TEXT("/Engine/EngineFonts/Roboto"));
 // 		HeaderFont = FSlateFontInfo(RobotoFontObj.Object, 12, FName("Bold"));
-
+		SpinBoxStyle = FCoreStyle::Get().GetWidgetStyle<FSpinBoxStyle>("SpinBox");
+		SpinBoxStyle.BackgroundBrush.TintColor = FSlateColor(FLinearColor(.05f, .05f, .05f, 1.f));
+		SpinBoxStyle.HoveredBackgroundBrush.TintColor = FSlateColor(FLinearColor(.15f, .15f, .15f, 1.f));
+		SpinBoxStyle.ActiveFillBrush.TintColor = FSlateColor(FLinearColor(.1f, .1f, .1f, 3.f));
+		SpinBoxStyle.InactiveFillBrush.TintColor = FSlateColor(FLinearColor(.1f, .1f, .1f, 3.f));
+		SpinBoxStyle.ForegroundColor = FSlateColor(FLinearColor(1, 1, 1, 1.f));
 
 		HeaderStyle.HandlerSize = 1;
 		HeaderStyle.Margin = FMargin(1, 1, 1, 1);

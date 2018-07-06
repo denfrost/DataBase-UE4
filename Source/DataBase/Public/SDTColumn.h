@@ -4,7 +4,7 @@
 #include "DataTab.h"
 #include "Runtime/SlateCore/Public/Widgets/SCompoundWidget.h"
 
-DECLARE_DELEGATE_TwoParams(FOnColumnChanged, const int32&, const FString&);
+DECLARE_DELEGATE_ThreeParams(FOnColumnChanged, const int32&, const FString&, const UObject*);
 
 class SDTColumn : public SCompoundWidget
 {
@@ -15,6 +15,8 @@ class SDTColumn : public SCompoundWidget
 	{}
 
 	SLATE_ARGUMENT(FText, Value)
+	SLATE_ARGUMENT(EDataTableTypes, Type)
+	SLATE_ARGUMENT(UClass*, FilterClass)
 	SLATE_ARGUMENT(const FDataTableStyle*, DataTableStyle)
 	SLATE_ARGUMENT(bool, Editable)
 	SLATE_ARGUMENT(int32, ColumnIndex)
@@ -25,6 +27,9 @@ class SDTColumn : public SCompoundWidget
 
 public:
 	FText Value;
+	EDataTableTypes Type;
+	UClass* FilterClass;
+
 	const FDataTableStyle* DataTableStyle;
 	bool bIsEditable;
 	bool bIsMaster;
@@ -37,6 +42,9 @@ public:
 
 private:
 	void OnTextCommitted(const FText& InText, ETextCommit::Type CommitedType);
+	void OnObjectChanged(const FText& InText, const UObject* NewObjectRef);
+	TSharedPtr<SWidget> GenerateEditWidget(EDataTableTypes InType, const FText& InValue);
+
 public:
 	void SetFontAndColor(const FDataTableStyleOverride& InDTStyleOverride);
 	void Construct(const FArguments& InArgs);

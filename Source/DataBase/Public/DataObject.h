@@ -25,6 +25,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data Table", meta = (ToolTip = "Determine which type of data should be this column"))
 		EDataTableTypes Type;
 
+ 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data Table", meta = (ToolTip = "pick a class to filter when you use object"))
+		TSubclassOf<UObject> ObjectFilter;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data Table", meta = (ToolTip = "if is hidden this will not be draw in the UMG"))
 		bool bHidden;
 
@@ -33,6 +36,7 @@ public:
 		FieldName = FText::FromString("None");
 		Type = EDataTableTypes::String;
 		bHidden = false;
+		ObjectFilter = UObject::StaticClass();
 	}
 };
 
@@ -44,6 +48,12 @@ struct FRowData
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data Table Options") 
 		TArray<FString> Inputs;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Data Table Options")
+		TArray<UObject*> References;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Data Table Options")
+		TArray<int32> IndexReferences;
 };
 
 
@@ -66,6 +76,8 @@ private:
 	UPROPERTY()
 		FString JsonString;
 
+	
+
 public:
 
 	UDataObject();
@@ -78,6 +90,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "CSV Options")
 		FFilePath CSVPath;
+
+	UPROPERTY(EditAnywhere, Category = "CSV Options")
+		bool bSaveFileOnSave;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data Table Options")
 		TArray<FDataTableFieldDescription> Fields;
@@ -105,7 +120,8 @@ public:
 		FUpdateDataTable OnDataTableUpdate;
 
 
-	
+
+	FString GetCSVPathFile(FString* Folder, FString* FileName);
 
 
 

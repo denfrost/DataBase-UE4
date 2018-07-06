@@ -101,6 +101,8 @@ private:
 
 	//Binds
 	void OnPropertyChanged(const FPropertyChangedEvent& PropertyChangedEvet);
-	void OnDataTableChanged(const int32& RowIndex, const int32& ColumnIndex, const FString& Value);
+	void OnDataTableChanged(const int32& RowIndex, const int32& ColumnIndex, const FString& Value,const UObject* NewObjReference);
 
+protected:
+	virtual void SaveAsset_Execute() override;
 };

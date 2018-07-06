@@ -45,6 +45,7 @@ public class DataBase : ModuleRules
                 "Projects",
                 "HTTP",
                 "Json",
+                "AssetRegistry",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
@@ -56,5 +57,15 @@ public class DataBase : ModuleRules
 				// ... add any modules that your module loads dynamically here ...
 			}
 			);
-	}
+
+        if (Target.bBuildEditor)//we only want this to be included for editor builds but not packaged builds
+        {
+            PublicDependencyModuleNames.AddRange(
+                new string[] {
+                    "UnrealEd",
+                    "PropertyEditor",
+                }
+            );
+        }
+    }
 }

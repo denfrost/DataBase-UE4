@@ -5,7 +5,7 @@
 #include "DataObject.h"
 #include "Runtime/SlateCore/Public/Widgets/SCompoundWidget.h"
 
-DECLARE_DELEGATE_ThreeParams(FOnDTRowChanged, const int32&, const int32&, const FString&)
+DECLARE_DELEGATE_FourParams(FOnDTRowChanged, const int32&, const int32&, const FString&, const UObject* )
 DECLARE_DELEGATE_TwoParams(FOnRowClicked, const int32&,const TArray<FString>&)
 
 class SDTHeaderRow : public SCompoundWidget
@@ -47,7 +47,7 @@ private:
 	TArray<TSharedPtr<class SDTColumn>> Columns;
 	TArray<int32> ColumnIDs;
 
-	void OnColumnChanged(const int32& ColumnIndex, const FString& Value);
+	void OnColumnChanged(const int32& ColumnIndex, const FString& Value, const UObject* NewObjReference);
 	FReply OnRowBtnClicked();
 
 	int32 getLargestValueTextSize();
@@ -55,18 +55,6 @@ private:
 
 public:
 	
-	//BEGIN SWidget
-	/*virtual FReply OnMouseButtonDoubleClick(const FGeometry& InMyGeometry, const FPointerEvent& InMouseEvent) override;*/ //Double click only works on desktop
-// 	virtual FReply OnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
-// 	virtual FReply OnMouseButtonUp(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
-// 	virtual void OnMouseEnter(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
-// 	virtual void OnMouseLeave(const FPointerEvent& MouseEvent) override;
-// 	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime);
-	//END SWidget
-
-
-
-
 	bool CheckCriteria(const FDTCriteria& InCriteria);
 	void SetColumns(const TArray<FDataTableFieldDescription>& InFields, const TArray<FString>& InValues);
 	void UpdateWidget();

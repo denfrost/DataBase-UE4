@@ -4,9 +4,9 @@
 #include "Runtime/Slate/Public/Widgets/Layout/SScrollBox.h"
 #include "DTFunctionLibrary.h"
 
-void SDataTab::OnRowChanged(const int32& RowIndex, const int32& ColumnIndex, const FString& Value)
+void SDataTab::OnRowChanged(const int32& RowIndex, const int32& ColumnIndex, const FString& Value, const UObject* NewObjReference)
 {
-	OnDataTableChanged.ExecuteIfBound(RowIndex, ColumnIndex, Value);
+	OnDataTableChanged.ExecuteIfBound(RowIndex, ColumnIndex, Value, NewObjReference);
 }
 
 void SDataTab::OnRowClicked(const int32& RowIndex, const TArray<FString>& Values)

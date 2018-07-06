@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "DataObject.h"
 #include "DataTab.h"
+#include "Runtime/AssetRegistry/Public/AssetData.h"
 #include "DTFunctionLibrary.generated.h"
 
 
@@ -56,7 +57,7 @@ public:
 					if (UBoolProperty* BoolProperty = Cast<UBoolProperty>(Property))
 					{
 						bool valBool = false;
-						if (InRow.Inputs[i].Contains("true") || InRow.Inputs[i].Contains("0"))
+						if (InRow.Inputs[i].Contains("true") || InRow.Inputs[i].Contains("1"))
 						{
 							valBool = true;
 						}
@@ -91,6 +92,23 @@ public:
 					{
 						StringProperty->SetPropertyValue_InContainer(StructPtr, InRow.Inputs[i]);
 						continue;
+					}
+					break;
+				}
+				case EDataTableTypes::UEObject:
+				{
+					if (UObjectProperty* ObjectProperty = Cast<UObjectProperty>(Property))
+					{
+						FAssetData AssetData;
+						AssetData.ObjectPath = FName(*InRow.Inputs[i]);
+						UObject* object = AssetData.GetAsset();
+// 
+// 						for (int32 i = 0;i  < InRow.References.Num(); i++)
+// 						{
+// 							GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, InRow.References[i]->GetName());
+// 						}
+
+						ObjectProperty->SetPropertyValue_InContainer(StructPtr, object);
 					}
 					break;
 				}

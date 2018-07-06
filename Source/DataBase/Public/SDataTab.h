@@ -7,7 +7,7 @@
 class SDataTabHeader;
 class SDataTableRow;
 
-DECLARE_DELEGATE_ThreeParams(FOnDataTableChanged, const int32&, const int32&, const FString&);
+DECLARE_DELEGATE_FourParams(FOnDataTableChanged, const int32&, const int32&, const FString&, const UObject*);
 DECLARE_DELEGATE_TwoParams(FOnDTRowClicked, const int32&, const TArray<FString>&)
 
 class DATABASE_API SDataTab : public SCompoundWidget
@@ -57,7 +57,7 @@ private:
 	TArray<TSharedPtr<SDTHeaderRow>> Rows;
 	TArray<FDataTableFieldDescription> Fields;
 
-	void OnRowChanged(const int32& RowIndex, const int32& ColumnIndex, const FString& Value);
+	void OnRowChanged(const int32& RowIndex, const int32& ColumnIndex, const FString& Value, const UObject* NewObjReference);
 	void OnRowClicked(const int32& RowIndex, const TArray<FString>& Values);
 	void OnRowDoubleClicked(const int32& RowIndex, const TArray<FString>& Values);
 

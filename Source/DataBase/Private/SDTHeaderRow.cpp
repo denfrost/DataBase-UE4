@@ -64,13 +64,14 @@ void SDTHeaderRow::UpdateWidget()
 				[
 					SAssignNew(Col, SDTColumn)
 					.Value(FText::FromString(FormattedText))
+					.Type(Fields[i].Type)
+					.FilterClass(Fields[i].ObjectFilter)
 					.DataTableStyle(DataTableStyle)
 					.Editable(bIsEditable)
 					.ColumnIndex(i)
 					.OnColumnChanged(this, &SDTHeaderRow::OnColumnChanged)
 					.bIsMaster(bIsMaster)
 				]
-			
 		];
 
 		ColumnIDs.Add(i);
@@ -103,11 +104,11 @@ void SDTHeaderRow::OverrideColumnStyle(const FDataTableStyleOverride& InStyle)
 	}
 }
 
-void SDTHeaderRow::OnColumnChanged(const int32& ColumnIndex, const FString& Value)
+void SDTHeaderRow::OnColumnChanged(const int32& ColumnIndex, const FString& Value, const UObject* NewObjReference)
 {
 	if (OnDTRowChanged.IsBound())
 	{
-		OnDTRowChanged.ExecuteIfBound(RowIndex, ColumnIndex, Value);
+		OnDTRowChanged.ExecuteIfBound(RowIndex, ColumnIndex, Value, NewObjReference);
 	}
 }
 

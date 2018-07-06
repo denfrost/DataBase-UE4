@@ -237,8 +237,15 @@ void FDataObjectEditor::ExportCSV()
 		
 		if (!ParentWindow.IsValid()) return;
 
+		FString OpenDirectory;
+		DataObject->GetCSVPathFile(&OpenDirectory, nullptr);
+		if (!FPaths::DirectoryExists(OpenDirectory))
+		{
+			OpenDirectory = FPaths::ProjectDir();
+		}
+
 		TArray<FString> OutFile;
-		if (DesktopPlatform->SaveFileDialog(ParentWindow->GetNativeWindow()->GetOSWindowHandle(), "Export data object as csv", FPaths::ProjectSavedDir(), "", "CSV document|*.csv", EFileDialogFlags::None, OutFile))
+		if (DesktopPlatform->SaveFileDialog(ParentWindow->GetNativeWindow()->GetOSWindowHandle(), "Export data object as csv", OpenDirectory, "", "CSV document|*.csv", EFileDialogFlags::None, OutFile))
 		{
 			if (!OutFile.IsValidIndex(0)) return;
 
@@ -264,8 +271,15 @@ void FDataObjectEditor::ImportFromCSV()
 
 		if (!ParentWindow.IsValid()) return;
 
+		FString OpenDirectory; 
+		DataObject->GetCSVPathFile(&OpenDirectory, nullptr);
+		if (!FPaths::DirectoryExists(OpenDirectory))
+		{
+			OpenDirectory = FPaths::ProjectDir();
+		}
+
 		TArray<FString> OutFile;
-		if (DesktopPlatform->OpenFileDialog(ParentWindow->GetNativeWindow()->GetOSWindowHandle(), "Choose csv file", FPaths::ProjectDir(), "", "CSV document|*.csv", EFileDialogFlags::None, OutFile))
+		if (DesktopPlatform->OpenFileDialog(ParentWindow->GetNativeWindow()->GetOSWindowHandle(), "Choose csv file", OpenDirectory, "", "CSV document|*.csv", EFileDialogFlags::None, OutFile))
 		{
 			if (!OutFile.IsValidIndex(0)) return;
 			
@@ -348,14 +362,45 @@ void FDataObjectEditor::OnPropertyChanged(const FPropertyChangedEvent& PropertyC
 	DataObject->MarkPackageDirty();
 }
 
-void FDataObjectEditor::OnDataTableChanged(const int32& RowIndex, const int32& ColumnIndex, const FString& Value)
+void FDataObjectEditor::OnDataTableChanged(const int32& RowIndex, const int32& ColumnIndex, const FString& Value,const UObject* NewObjReference)
 {
 	if (DataObject && DataObject->Data.IsValidIndex(RowIndex) && DataObject->Data[RowIndex].Inputs.IsValidIndex(ColumnIndex))
 	{
 		DataObject->Data[RowIndex].Inputs[ColumnIndex] = Value;
+		UObject* obj = const_cast<UObject*>(NewObjReference);
+
+		if (obj && !DataObject->Data[RowIndex].References.Contains(obj))
+		{
+			DataObject->Data[RowIndex].References.Add(obj);
+			DataObject->Data[RowIndex].IndexReferences.Add(ColumnIndex);
+		}
+		else if (DataObject->Data[RowIndex].IndexReferences.Contains(ColumnIndex))
+		{
+			for (int32 i = 0; i < DataObject->Data[RowIndex].IndexReferences.Num(); i++)
+			{
+				if (DataObject->Data[RowIndex].IndexReferences[i] == ColumnIndex)
+				{
+					DataObject->Data[RowIndex].IndexReferences.RemoveAt(i);
+					DataObject->Data[RowIndex].References.RemoveAt(i);
+				}
+				break;
+			}
+		}
 		DataObject->MarkPackageDirty();
 		return;
 	}
 	UE_LOG(LogTemp, Error, TEXT("Invalid Entry Row: %i , Column: %i , Value: %s"), RowIndex, ColumnIndex, *Value);
+}
+
+void FDataObjectEditor::SaveAsset_Execute()
+{
+	FAssetEditorToolkit::SaveAsset_Execute();
+	if (DataObject && DataObject->bSaveFileOnSave && FPaths::FileExists(DataObject->CSVPath.FilePath))
+	{
+		if (UDTFunctionLibrary::ExportCSV(DataObject, DataObject->CSVPath.FilePath))
+		{
+			UE_LOG(LogTemp, Log, TEXT("updated csv file linked to this DO: %s"), *DataObject->CSVPath.FilePath);
+		}
+	}
 }
 

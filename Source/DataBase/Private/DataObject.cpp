@@ -1,5 +1,20 @@
 #include "DataObject.h"
+#include "DTFunctionLibrary.h"
 
+
+// void UDataObject::Serialize(FArchive& Ar)
+// {
+// 	Super::Serialize(Ar);
+// 	if (SaveFileOnSave && bDirty)
+// 	{
+// 		if (FPaths::FileExists(CSVPath.FilePath))
+// 		{
+// 			UDTFunctionLibrary::ExportCSV(this, CSVPath.FilePath);
+// 			UE_LOG(LogTemp, Log, TEXT("Updated csv file assigned to this DT"));
+// 			bDirty = false;
+// 		}
+// 	}
+// }
 
 UDataObject::UDataObject()
 {
@@ -69,12 +84,17 @@ FString UDataObject::GetCSVPath(bool bOnlyName /*= true*/)
 	if (bOnlyName)
 	{
 		FString Output;
-		CSVPath.FilePath.Split("/", nullptr, &Output, ESearchCase::IgnoreCase, ESearchDir::FromEnd);
+		GetCSVPathFile(nullptr, &Output);
 		return Output;
 	}
 	return CSVPath.FilePath;
 }
 
+FString UDataObject::GetCSVPathFile(FString* Folder, FString* FileName)
+{
+	CSVPath.FilePath.Split("/", Folder, FileName, ESearchCase::IgnoreCase, ESearchDir::FromEnd);
+	return CSVPath.FilePath;
+}
 
 
 
